@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siêu Máy Gắp Thú 5D - Thumbs Up Vision Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: radial-gradient(circle at 50% 10%, #fff0f6 0%, #f3d9fa 45%, #c5f6fa 100%);
+            user-select: none;
+            overflow-x: hidden;
+        }
+        .font-title {
+            font-family: 'Baloo 2', cursive;
+        }
+        .cabinet-glass {
+            background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.06) 38%, rgba(255,255,255,0.22) 100%);
+            box-shadow: inset 0 0 40px rgba(244, 114, 182, 0.3), inset 0 12px 24px rgba(255,255,255,0.75);
+        }
+        @keyframes plush-breathe {
+            0%, 100% { transform: translate(-50%, 0) scale(1, 1); }
+            50% { transform: translate(-50%, -5px) scale(1.05, 0.95); }
+        }
+        .plush-3d {
+            animation: plush-breathe 2.4s infinite ease-in-out;
+            filter: drop-shadow(0 9px 7px rgba(80, 20, 60, 0.3));
+            transition: bottom 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes struggle-swing {
+            0%, 100% { transform: rotate(-10deg) scale(1.04, 0.96); }
+            50% { transform: rotate(10deg) scale(0.96, 1.04); }
+        }
+        .plush-struggle {
+            animation: struggle-swing 0.3s infinite ease-in-out !important;
+        }
+        @keyframes drop-into-chute {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            70% { transform: translateY(230px) scale(0.85) rotate(25deg); opacity: 1; }
+            100% { transform: translateY(290px) scale(0.5) rotate(45deg); opacity: 0; }
+        }
+        .animate-chute-drop {
+            animation: drop-into-chute 0.65s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        }
+        .claw-finger-left, .claw-finger-right {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .claw-open .claw-finger-left { transform: rotate(28deg); }
+        .claw-open .claw-finger-right { transform: rotate(-28deg); }
+        .claw-grab .claw-finger-left { transform: rotate(-18deg); }
+        .claw-grab .claw-finger-right { transform: rotate(18deg); }
+
+        .btn-arcade-pink {
+            box-shadow: 0 7px 0 #be185d, 0 10px 18px rgba(190, 24, 93, 0.35);
+            transition: all 0.08s;
+        }
+        .btn-arcade-pink:active:not(:disabled) {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #be185d;
+        }
+        .btn-arcade-blue {
+            box-shadow: 0 6px 0 #0369a1, 0 8px 14px rgba(3, 105, 161, 0.3);
+            transition: all 0.08s;
+        }
+        .btn-arcade-blue:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0369a1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-3 px-2 md:px-4">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-6xl flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md px-5 py-3 rounded-[28px] shadow-xl border-4 border-pink-300">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-md border-2 border-white animate-pulse">
+                <span class="text-2xl">👍</span>
+            </div>
+            <div>
+                <h1 class="font-title text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 leading-none">
+                    MÁY GẮP THÚ AI - VISION ENGINE MỚI
+                </h1>
+                <p class="text-xs md:text-sm text-purple-600 font-extrabold mt-0.5">
+                    Lướt tay Trái/Phải để di chuyển • Giơ ngón cái lên 👍 để kích hoạt gắp ngay!
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+            <button onclick="openQuestionManager()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-2xl shadow-md transition flex items-center gap-2 text-sm">
+                <span>📝</span> Soạn Câu Hỏi (<span id="qCountBadge">0</span>)
+            </button>
+            <button onclick="shufflePlushies('manual')" class="bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold px-3.5 py-2 rounded-2xl shadow-md transition text-sm flex items-center gap-1.5">
+                <span>🌪️</span> Xốc Đảo Thú
+            </button>
+        </div>
+    </header>
+
+    <!-- GIAO DIỆN CHÍNH -->
+    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-3 items-start">
+
+        <!-- CỘT TRÁI: MÁY GẮP THÚ (7 CỘT) -->
+        <div id="fullMachineWrapper" class="lg:col-span-7 flex flex-col items-center w-full">
+
+            <div class="w-full max-w-xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 rounded-t-[44px] p-3.5 border-4 border-b-0 border-pink-600 shadow-lg flex justify-between items-center px-6 relative overflow-hidden">
+                <div class="flex gap-2">
+                    <span class="w-3.5 h-3.5 rounded-full bg-yellow-300 animate-ping"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-cyan-300 animate-bounce"></span>
+                </div>
+                <div class="bg-white/95 px-5 py-1 rounded-full shadow-inner border-2 border-pink-200 flex items-center gap-2">
+                    <span class="font-title text-pink-600 font-extrabold tracking-wider text-sm md:text-base">✨ THUMBS UP ARENA ✨</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="w-3.5 h-3.5 rounded-full bg-cyan-300 animate-bounce"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-yellow-300 animate-ping"></span>
+                </div>
+            </div>
+
+            <!-- LỒNG KÍNH -->
+            <div id="machineCabinet" class="w-full max-w-xl h-[400px] bg-gradient-to-b from-sky-100 via-pink-50 to-purple-100 border-x-8 border-pink-500 relative overflow-hidden select-none">
+                <div class="absolute inset-0 opacity-35 pointer-events-none" style="background-image: radial-gradient(#f472b6 2px, transparent 2px); background-size: 24px 24px;"></div>
+                <div id="fxLayer" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+                <div class="w-full h-4 bg-gradient-to-b from-slate-300 to-slate-400 border-b-2 border-slate-500 relative z-20 flex items-center px-4">
+                    <div class="w-full h-1 bg-slate-600/40 rounded-full"></div>
+                </div>
+
+                <div class="absolute top-6 left-3 right-3 z-30 flex justify-between items-center pointer-events-none">
+                    <div class="bg-white/90 backdrop-blur px-3 py-1 rounded-full border-2 border-purple-300 shadow-sm flex items-center gap-1.5">
+                        <span class="text-xs">🌪️</span>
+                        <span id="shuffleCountText" class="text-[11px] font-black text-purple-700">Tự xốc đảo sau: 2 lượt</span>
+                    </div>
+                </div>
+
+                <!-- CÀNG GẮP -->
+                <div id="clawAssembly" class="absolute top-2 z-20 flex flex-col items-center pointer-events-none" style="left: 250px; transform: translateX(-50%);">
+                    <div class="w-14 h-6 bg-gradient-to-b from-pink-400 to-pink-600 rounded-b-xl border-2 border-pink-700 shadow-md flex items-center justify-center">
+                        <div class="w-6 h-2 bg-yellow-300 rounded-full"></div>
+                    </div>
+                    <div id="clawCable" class="w-1.5 bg-gradient-to-r from-slate-500 via-slate-300 to-slate-600 shadow-sm" style="height: 28px;"></div>
+                    
+                    <div id="clawHead" class="relative flex flex-col items-center -mt-1">
+                        <div class="w-11 h-8 bg-gradient-to-b from-amber-300 to-amber-500 rounded-2xl border-2 border-amber-700 shadow-md z-20 flex items-center justify-center">
+                            <div class="w-4 h-4 rounded-full bg-white/80 shadow-inner"></div>
+                        </div>
+
+                        <div class="flex justify-between w-24 -mt-2 relative z-10">
+                            <svg class="claw-finger-left w-12 h-16 origin-top-right" viewBox="0 0 50 70">
+                                <path d="M45 5 C15 10, 8 35, 18 58 C22 65, 32 66, 36 60" fill="none" stroke="#475569" stroke-width="6" stroke-linecap="round"/>
+                                <circle cx="34" cy="60" r="4.5" fill="#ec4899" stroke="#9d174d" stroke-width="2"/>
+                            </svg>
+                            <svg class="claw-finger-right w-12 h-16 origin-top-left" viewBox="0 0 50 70">
+                                <path d="M5 5 C35 10, 42 35, 32 58 C28 65, 18 66, 14 60" fill="none" stroke="#475569" stroke-width="6" stroke-linecap="round"/>
+                                <circle cx="16" cy="60" r="4.5" fill="#ec4899" stroke="#9d174d" stroke-width="2"/>
+                            </svg>
+                        </div>
+
+                        <div id="laserSight" class="w-0.5 h-60 bg-gradient-to-b from-rose-500/70 via-pink-400/40 to-transparent -mt-3 pointer-events-none"></div>
+                        <div id="clawHeldSlot" class="absolute top-7 w-24 h-24 flex items-center justify-center z-15"></div>
+                    </div>
+                </div>
+
+                <!-- HỐ THẢ QUÀ -->
+                <div class="absolute bottom-0 left-0 w-[118px] h-[145px] z-25 pointer-events-none flex flex-col justify-end">
+                    <div class="w-full h-7 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 rounded-tr-2xl border-t-4 border-r-4 border-white shadow-lg flex items-center justify-center">
+                        <span class="text-[11px] font-black text-white tracking-wider uppercase">⬇ HỐ THẢ THÚ</span>
+                    </div>
+                    <div class="w-full flex-1 bg-gradient-to-b from-slate-900/50 via-pink-950/60 to-slate-950/80 border-r-4 border-pink-400 backdrop-blur-[2px] relative overflow-hidden flex flex-col items-center justify-center">
+                        <div class="w-16 h-full border-x-2 border-dashed border-pink-300/40 flex items-center justify-center">
+                            <span class="text-pink-200/60 font-title font-bold text-xs rotate-[-90deg] whitespace-nowrap">DROP CHUTE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="plushPit" class="absolute inset-0 z-10 pointer-events-none"></div>
+                <div class="absolute inset-0 cabinet-glass pointer-events-none z-30"></div>
+            </div>
+
+            <!-- ĐIỀU KHIỂN & HỘC QUÀ -->
+            <div class="w-full max-w-xl bg-gradient-to-b from-pink-500 via-rose-500 to-pink-600 rounded-b-[42px] p-4 border-4 border-t-4 border-pink-700 shadow-2xl grid grid-cols-12 gap-3 items-center relative">
+                
+                <div class="col-span-5 sm:col-span-4 flex flex-col items-center">
+                    <div class="w-full bg-slate-900/90 rounded-2xl border-4 border-pink-300 shadow-inner h-26 relative flex flex-col items-center justify-center overflow-visible p-2">
+                        <div class="absolute top-0 inset-x-2 h-4 bg-white/15 rounded-b-lg border-b border-white/25 flex items-center justify-center">
+                            <span class="text-[10px] font-extrabold text-pink-200 uppercase tracking-widest">Cửa Lấy Quà</span>
+                        </div>
+                        <div id="prizeTraySlot" class="mt-2 flex flex-col items-center justify-center">
+                            <span class="text-[11px] text-slate-400 font-bold text-center px-1">Thả thú xuống đây</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 sm:col-span-8 flex flex-col items-center justify-between gap-2 bg-pink-700/40 p-3 rounded-3xl border-2 border-pink-300/40">
+                    <div class="w-full flex items-center justify-around gap-2">
+                        <div class="flex items-center gap-2">
+                            <button id="btnLeft"
+                                onmousedown="startMove(-1)" onmouseup="stopMove()" onmouseleave="stopMove()"
+                                ontouchstart="startMove(-1); event.preventDefault();" ontouchend="stopMove()"
+                                class="btn-arcade-blue bg-sky-400 hover:bg-sky-300 text-white font-title font-extrabold text-2xl w-12 h-12 rounded-2xl border-2 border-white flex items-center justify-center">
+                                ◀
+                            </button>
+                            <button id="btnRight"
+                                onmousedown="startMove(1)" onmouseup="stopMove()" onmouseleave="stopMove()"
+                                ontouchstart="startMove(1); event.preventDefault();" ontouchend="stopMove()"
+                                class="btn-arcade-blue bg-sky-400 hover:bg-sky-300 text-white font-title font-extrabold text-2xl w-12 h-12 rounded-2xl border-2 border-white flex items-center justify-center">
+                                ▶
+                            </button>
+                        </div>
+
+                        <button onclick="shufflePlushies('manual')"
+                            class="bg-purple-500 hover:bg-purple-400 text-white font-title font-extrabold text-xs px-3 py-3 rounded-2xl border-2 border-white flex items-center gap-1 shadow">
+                            <span>🌪️</span> <span>XỐC THÚ</span>
+                        </button>
+
+                        <button id="btnGrab" onclick="startClawSequence()"
+                            class="btn-arcade-pink bg-gradient-to-b from-amber-300 to-amber-500 text-rose-900 font-title font-extrabold text-base px-4 py-3 rounded-full border-4 border-white tracking-wide flex items-center gap-1 shadow-xl">
+                            <span>🪝</span> <span>GẮP NGAY!</span>
+                        </button>
+                    </div>
+
+                    <div class="text-[11px] text-pink-100 font-bold text-center">
+                        🖐️ Lướt tay Trái/Phải ngắm gấu • Giơ ngón cái 👍 để gắp!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: WEBCAM AI & 2 RỔ ĐỘI (5 CỘT) -->
+        <div class="lg:col-span-5 flex flex-col gap-4 w-full">
+
+            <div class="bg-white/95 backdrop-blur-md p-3.5 rounded-[28px] border-4 border-purple-300 shadow-xl">
+                <!-- Chọn đội -->
+                <div class="flex items-center justify-between gap-2 mb-3 bg-purple-50 p-2 rounded-2xl border border-purple-200">
+                    <span class="text-xs font-black text-purple-700 ml-1">Lượt gắp:</span>
+                    <div class="flex gap-2">
+                        <button onclick="setActiveTeam('red')" id="teamRedBtn" class="px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-500 bg-red-500 text-white shadow">
+                            🔴 Đội Đỏ (<span id="scoreRed">0</span>đ)
+                        </button>
+                        <button onclick="setActiveTeam('blue')" id="teamBlueBtn" class="px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-200 bg-white text-blue-600">
+                            🔵 Đội Xanh (<span id="scoreBlue">0</span>đ)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-lg">🤖</span>
+                        <h3 class="font-title text-sm font-extrabold text-purple-700">Webcam Vision Tracking</h3>
+                    </div>
+                    <span id="aiEngineBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-emerald-300">
+                        🟢 Đang chạy trực tiếp
+                    </span>
+                </div>
+
+                <!-- Khung Video & Thanh đo Thumbs Up -->
+                <div id="webcamContainer" class="relative w-full h-48 bg-slate-900 rounded-2xl overflow-hidden border-2 border-purple-300 flex items-center justify-center">
+                    <video id="webcam" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100" autoplay playsinline muted></video>
+                    <canvas id="output_canvas" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100 pointer-events-none"></canvas>
+
+                    <!-- HUD Thanh đo mức độ giơ ngón cái -->
+                    <div class="absolute top-2 left-2 bg-black/75 backdrop-blur px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/20 z-20">
+                        <span class="text-[11px] text-white font-bold">Mức giơ ngón cái:</span>
+                        <div class="w-20 h-2.5 bg-gray-700 rounded-full overflow-hidden border border-gray-500">
+                            <div id="thumbBar" class="h-full bg-emerald-400 transition-all duration-75" style="width: 0%;"></div>
+                        </div>
+                        <span id="thumbVal" class="text-[11px] font-black text-amber-300">0%</span>
+                    </div>
+
+                    <!-- Hiệu ứng báo hiệu ĐÃ NHẬN THUMBS UP -->
+                    <div id="thumbLockAlert" class="absolute inset-0 bg-emerald-500/35 border-4 border-emerald-400 rounded-2xl hidden items-center justify-center z-30 pointer-events-none">
+                        <div class="bg-emerald-600 text-white font-title text-xl font-black px-5 py-2 rounded-full shadow-2xl animate-bounce flex items-center gap-2">
+                            <span>👍</span> THUMBS UP: GẮP NGAY!
+                        </div>
+                    </div>
+
+                    <!-- Thanh trạng thái phía dưới -->
+                    <div class="absolute bottom-2 left-2 right-2 bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-xl flex justify-between items-center text-white text-xs font-extrabold z-20 border border-white/10">
+                        <span id="gestureText" class="text-cyan-300 flex items-center gap-1">
+                            <span>🔍</span> Đang quét bàn tay...
+                        </span>
+                        <span id="handCoordText" class="text-pink-300 bg-white/10 px-2 py-0.5 rounded-md">Vị trí: Giữa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 RỔ ĐỰNG THÚ -->
+            <div class="bg-white/95 backdrop-blur-md p-4 rounded-[32px] border-4 border-pink-300 shadow-xl flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-title text-lg text-pink-600 font-extrabold flex items-center gap-1.5">
+                        <span>🧺</span> Kho Thú Của 2 Đội
+                    </h2>
+                    <span class="text-[11px] text-gray-500 font-bold">*Nhặt thú vào rổ đội đang gắp</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- RỔ ĐỎ -->
+                    <div class="bg-red-50/80 p-3 rounded-2xl border-2 border-red-300 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-title font-extrabold text-red-600 text-sm">🔴 Đội Đỏ (<span id="countRed">0</span>)</span>
+                            <button onclick="assignPrizeToTeam('red')" id="btnClaimRed" class="hidden bg-red-500 hover:bg-red-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow animate-bounce">
+                                Nhận về Đội Đỏ
+                            </button>
+                        </div>
+                        <div id="basketRedGrid" class="grid grid-cols-3 gap-1.5 min-h-[90px] bg-white/70 p-2 rounded-xl border border-red-200 content-start">
+                            <span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>
+                        </div>
+                    </div>
+
+                    <!-- RỔ XANH -->
+                    <div class="bg-blue-50/80 p-3 rounded-2xl border-2 border-blue-300 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-title font-extrabold text-blue-600 text-sm">🔵 Đội Xanh (<span id="countBlue">0</span>)</span>
+                            <button onclick="assignPrizeToTeam('blue')" id="btnClaimBlue" class="hidden bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow animate-bounce">
+                                Nhận về Đội Xanh
+                            </button>
+                        </div>
+                        <div id="basketBlueGrid" class="grid grid-cols-3 gap-1.5 min-h-[90px] bg-white/70 p-2 rounded-xl border border-blue-200 content-start">
+                            <span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL 1: CÂU HỎI NGỮ PHÁP -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-xl rounded-[36px] border-8 border-pink-300 shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 p-4 text-white flex items-center gap-4">
+                <div id="quizPlushPreview" class="w-16 h-16 bg-white/25 rounded-2xl flex items-center justify-center shrink-0 p-1 shadow-inner"></div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-xs uppercase tracking-wider bg-yellow-300 text-rose-900 px-3 py-0.5 rounded-full font-black">
+                            🎯 Thử thách giữ thú!
+                        </span>
+                        <span id="quizGiftBadge" class="text-xs bg-white/25 text-white px-2.5 py-0.5 rounded-full font-extrabold"></span>
+                    </div>
+                    <h3 id="quizTitle" class="font-title text-xl md:text-2xl font-extrabold mt-1">
+                        Trả lời đúng để thả thú rơi xuống hộp!
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 mb-5 shadow-inner">
+                    <span class="text-xs font-black text-purple-500 uppercase tracking-wider">Câu hỏi ngữ pháp Tiếng Anh:</span>
+                    <p id="quizQuestionText" class="text-lg md:text-xl font-black text-gray-800 mt-1 leading-relaxed">
+                        She _______ to school every day.
+                    </p>
+                </div>
+
+                <div id="quizOptionsBox" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                <div id="quizFeedbackBox" class="mt-4 hidden p-3.5 rounded-2xl text-center font-extrabold text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BẢNG SOẠN CÂU HỎI -->
+    <div id="managerModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-[34px] border-8 border-purple-300 shadow-2xl flex flex-col overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-500 px-6 py-4 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📚</span>
+                    <h2 class="font-title text-xl md:text-2xl font-bold">Trình Soạn Câu Hỏi Ngữ Pháp Trực Tiếp</h2>
+                </div>
+                <button onclick="closeQuestionManager()" class="bg-white/20 hover:bg-white/30 text-white font-extrabold px-4 py-1.5 rounded-xl">
+                    ✕ Đóng
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-6 flex-1">
+                <div class="md:col-span-5 bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
+                    <h3 class="font-title text-purple-700 font-bold text-lg mb-3">➕ Thêm Câu Hỏi Trắc Nghiệm</h3>
+                    
+                    <label class="block text-xs font-extrabold text-gray-600 mb-1">Câu hỏi:</label>
+                    <textarea id="inputQ" rows="2" placeholder="VD: Listen! The birds _____ in the tree." class="w-full p-2.5 rounded-xl border-2 border-purple-200 focus:border-purple-500 outline-none text-sm font-bold mb-3"></textarea>
+
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án A:</label>
+                            <input id="inputA" type="text" placeholder="sing" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án B:</label>
+                            <input id="inputB" type="text" placeholder="are singing" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án C:</label>
+                            <input id="inputC" type="text" placeholder="sang" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án D:</label>
+                            <input id="inputD" type="text" placeholder="sings" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
+                        </div>
+                    </div>
+
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án đúng:</label>
+                    <select id="inputAns" class="w-full p-2.5 rounded-xl border-2 border-purple-200 bg-white font-extrabold text-purple-700 text-sm mb-4">
+                        <option value="0">Đáp án A</option>
+                        <option value="1">Đáp án B</option>
+                        <option value="2">Đáp án C</option>
+                        <option value="3">Đáp án D</option>
+                    </select>
+
+                    <button onclick="addNewQuestion()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-2.5 rounded-xl shadow transition text-sm">
+                        💾 Lưu Câu Hỏi
+                    </button>
+                </div>
+
+                <div class="md:col-span-7 flex flex-col">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-title text-gray-700 font-bold text-lg">📋 Ngân Hàng Câu Hỏi Hiện Tại</h3>
+                        <button onclick="restoreSampleQuestions()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-3 py-1.5 rounded-lg">
+                            Khôi phục mẫu
+                        </button>
+                    </div>
+                    <div id="questionListBox" class="space-y-2.5 overflow-y-auto max-h-[380px] pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==============================================================
+           1. DANH MỤC THÚ BÔNG 3D & QUÀ
+           ============================================================== */
+        const PLUSHIE_TYPES = [
+            { id: 'pink_bear', name: 'Gấu Dâu 3D', primary: '#fb7185', secondary: '#ffe4e6', ear: '#e11d48', type: 'bear' },
+            { id: 'brown_bear', name: 'Gấu Nâu Brownie', primary: '#b45309', secondary: '#fef3c7', ear: '#78350f', type: 'bear' },
+            { id: 'white_bunny', name: 'Thỏ Ngọc', primary: '#f8fafc', secondary: '#fce7f3', ear: '#f472b6', type: 'bunny' },
+            { id: 'mint_frog', name: 'Ếch Cốm', primary: '#4ade80', secondary: '#dcfce7', ear: '#16a34a', type: 'frog' },
+            { id: 'yellow_chick', name: 'Vịt Vàng', primary: '#facc15', secondary: '#fef9c3', ear: '#f97316', type: 'chick' },
+            { id: 'purple_cat', name: 'Mèo Tím', primary: '#c084fc', secondary: '#f3e8ff', ear: '#9333ea', type: 'cat' }
+        ];
+
+        const GIFT_TIERS = [
+            { label: '👑 Siêu Cấp +50đ', bonus: 50, badge: '👑 +50đ', color: 'bg-gradient-to-r from-amber-400 to-rose-500 text-white', special: true },
+            { label: '💎 Kim Cương +30đ', bonus: 30, badge: '💎 +30đ', color: 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white', special: true },
+            { label: '🎁 Hộp Quà +20đ', bonus: 20, badge: '🎁 +20đ', color: 'bg-pink-500 text-white', special: true },
+            { label: '🍬 Kẹo Ngọt +15đ', bonus: 15, badge: '🍬 +15đ', color: 'bg-purple-500 text-white', special: false }
+        ];
+
+        function pickRandomGift() {
+            const r = Math.random();
+            if (r < 0.2) return GIFT_TIERS[0];
+            if (r < 0.45) return GIFT_TIERS[1];
+            if (r < 0.75) return GIFT_TIERS[2];
+            return GIFT_TIERS[3];
+        }
+
+        function create3DPlushSVG(model, uid, size = 66, gift = null) {
+            const gradId = `grad_${model.id}_${uid}`;
+            let earsMarkup = '';
+            if (model.type === 'bunny') {
+                earsMarkup = `<ellipse cx="32" cy="18" rx="9" ry="18" transform="rotate(-12 32 18)" fill="url(#${gradId})"/><ellipse cx="68" cy="18" rx="9" ry="18" transform="rotate(12 68 18)" fill="url(#${gradId})"/>`;
+            } else if (model.type === 'cat') {
+                earsMarkup = `<polygon points="20,38 24,12 44,28" fill="url(#${gradId})"/><polygon points="80,38 76,12 56,28" fill="url(#${gradId})"/>`;
+            } else {
+                earsMarkup = `<circle cx="25" cy="24" r="12" fill="url(#${gradId})"/><circle cx="75" cy="24" r="12" fill="url(#${gradId})"/>`;
+            }
+
+            const giftTagHTML = gift ? `<div class="absolute -top-2.5 left-1/2 -translate-x-1/2 ${gift.color} text-[9px] font-black px-1.5 py-0.5 rounded-full shadow border border-white whitespace-nowrap z-20">${gift.badge}</div>` : '';
+
+            return `
+            <div class="relative inline-flex items-center justify-center">
+                ${giftTagHTML}
+                <svg width="${size}" height="${size}" viewBox="0 0 100 100" class="overflow-visible select-none">
+                    <defs>
+                        <radialGradient id="${gradId}" cx="32%" cy="25%" r="72%"><stop offset="0%" stop-color="#fff"/><stop offset="30%" stop-color="${model.primary}"/><stop offset="100%" stop-color="${model.ear}"/></radialGradient>
+                    </defs>
+                    <ellipse cx="50" cy="93" rx="28" ry="6" fill="rgba(0,0,0,0.2)"/>
+                    <ellipse cx="50" cy="74" rx="25" ry="19" fill="url(#${gradId})"/>
+                    ${earsMarkup}
+                    <ellipse cx="50" cy="45" rx="31" ry="26" fill="url(#${gradId})"/>
+                    <circle cx="36" cy="45" r="4.8" fill="#0f172a"/><circle cx="64" cy="45" r="4.8" fill="#0f172a"/>
+                </svg>
+            </div>`;
+        }
+
+        /* ==============================================================
+           2. ÂM THANH & PHÁO HOA
+           ============================================================== */
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playTone(type) {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+
+            if (type === 'win') {
+                [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + idx * 0.08);
+                    gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.08); osc.stop(now + idx * 0.08 + 0.3);
+                });
+            } else if (type === 'slip') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.35);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.35);
+            }
+        }
+
+        function triggerMegaFireworks() {
+            confetti({ particleCount: 120, spread: 90, origin: { y: 0.6, x: 0.1 } });
+            confetti({ particleCount: 120, spread: 90, origin: { y: 0.6, x: 0.9 } });
+            setTimeout(() => {
+                confetti({
+                    particleCount: 180,
+                    spread: 120,
+                    startVelocity: 45,
+                    origin: { y: 0.5, x: 0.5 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+                });
+            }, 350);
+        }
+
+        /* ==============================================================
+           3. QUẢN LÝ 2 ĐỘI & ĐIỂM SỐ
+           ============================================================== */
+        let activeTeam = 'red';
+        let teamScores = { red: 0, blue: 0 };
+        let teamBaskets = { red: [], blue: [] };
+
+        function setActiveTeam(team) {
+            activeTeam = team;
+            const btnRed = document.getElementById('teamRedBtn');
+            const btnBlue = document.getElementById('teamBlueBtn');
+            if (team === 'red') {
+                btnRed.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-500 bg-red-500 text-white shadow';
+                btnBlue.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-200 bg-white text-blue-600';
+            } else {
+                btnBlue.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-500 bg-blue-500 text-white shadow';
+                btnRed.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-200 bg-white text-red-600';
+            }
+            setStatus(`Đang tới lượt gắp của ${team === 'red' ? 'ĐỘI ĐỎ 🔴' : 'ĐỘI XANH 🔵'}!`);
+        }
+
+        /* ==============================================================
+           4. DỮ LIỆU CÂU HỎI
+           ============================================================== */
+        const SAMPLE_QUESTIONS = [
+            { q: "She _______ to school by bike every day.", options: ["go", "goes", "going", "went"], answer: 1 },
+            { q: "Look! The cute bunny _______ a carrot right now.", options: ["eats", "ate", "is eating", "eating"], answer: 2 },
+            { q: "They _______ a big teddy bear yesterday.", options: ["bought", "buy", "buys", "buying"], answer: 0 }
+        ];
+        let questions = JSON.parse(localStorage.getItem('claw5d_questions')) || SAMPLE_QUESTIONS;
+        let pendingPrize = null;
+        let turnsUntilAutoShuffle = 2;
+
+        function syncQuestionStorage() {
+            localStorage.setItem('claw5d_questions', JSON.stringify(questions));
+            document.getElementById('qCountBadge').innerText = questions.length;
+        }
+
+        /* ==============================================================
+           5. MÁY GẮP THÚ
+           ============================================================== */
+        let pitPlushies = [];
+        let uidSeed = 1;
+        let clawX = 250;
+        let moveDir = 0;
+        let moveTimer = null;
+        let isClawBusy = false;
+        let activeGrabbedPlush = null;
+        const CHUTE_CENTER_X = 58;
+
+        function spawnPlushiePile() {
+            const pit = document.getElementById('plushPit');
+            pit.innerHTML = '';
+            pitPlushies = [];
+            const cabinetW = document.getElementById('machineCabinet').clientWidth;
+            const minX = 152, maxX = cabinetW - 42;
+            const layers = [{ count: 7, bottomY: 8, z: 11 }, { count: 6, bottomY: 38, z: 12 }, { count: 5, bottomY: 70, z: 13 }];
+
+            layers.forEach((layer) => {
+                const step = (maxX - minX) / Math.max(1, layer.count - 1);
+                for (let i = 0; i < layer.count; i++) {
+                    const model = PLUSHIE_TYPES[Math.floor(Math.random() * PLUSHIE_TYPES.length)];
+                    const gift = pickRandomGift();
+                    const x = Math.max(minX, Math.min(maxX, minX + i * step + (Math.random() * 20 - 10)));
+                    const bottom = Math.max(6, layer.bottomY + (Math.random() * 8 - 4));
+                    const uid = uidSeed++;
+                    const id = 'p3d_' + uid;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.id = id;
+                    wrapper.className = `absolute plush-3d ${gift.special ? 'plush-has-gift' : ''}`;
+                    wrapper.style.left = `${x}px`;
+                    wrapper.style.bottom = `${bottom}px`;
+                    wrapper.style.zIndex = layer.z;
+                    wrapper.innerHTML = create3DPlushSVG(model, uid, 68, gift);
+                    pit.appendChild(wrapper);
+
+                    pitPlushies.push({ id, uid, model, gift, x, bottom, z: layer.z, el: wrapper });
+                }
+            });
+        }
+
+        async function shufflePlushies(reason = 'manual') {
+            if (isClawBusy) return;
+            isClawBusy = true;
+            playTone('win');
+            spawnPlushiePile();
+            turnsUntilAutoShuffle = 2;
+            document.getElementById('shuffleCountText').innerText = `Tự xốc đảo sau: 2 lượt`;
+            setStatus("🌪️ Đã xốc đảo toàn bộ thú bông và nạp quà mới!");
+            await window.setTimeout(() => { isClawBusy = false; }, 600);
+        }
+
+        function renderClawX() {
+            const cabinetW = document.getElementById('machineCabinet').clientWidth;
+            clawX = Math.max(145, Math.min(cabinetW - 40, clawX));
+            document.getElementById('clawAssembly').style.left = `${clawX}px`;
+        }
+
+        function startMove(dir) {
+            if (isClawBusy) return;
+            moveDir = dir;
+            if (moveTimer) clearInterval(moveTimer);
+            moveTimer = setInterval(() => {
+                clawX += moveDir * 5.5;
+                renderClawX();
+            }, 22);
+        }
+
+        function stopMove() {
+            moveDir = 0;
+            if (moveTimer) { clearInterval(moveTimer); moveTimer = null; }
+        }
+
+        // BỎ HOÀN TOÀN PHÍM SPACE - CHỈ DÙNG MŨI TÊN DỰ PHÒNG
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') startMove(-1);
+            if (e.key === 'ArrowRight') startMove(1);
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') stopMove();
+        });
+
+        async function startClawSequence() {
+            if (isClawBusy) return;
+            if (pendingPrize) {
+                setStatus("🎁 Hãy bấm nhận thú về rổ của đội trước khi gắp tiếp!");
+                return;
+            }
+            if (questions.length === 0) { alert("Chưa có câu hỏi!"); return; }
+
+            stopMove();
+            isClawBusy = true;
+            const clawHead = document.getElementById('clawHead');
+            const heldSlot = document.getElementById('clawHeldSlot');
+
+            clawHead.classList.remove('claw-grab');
+            clawHead.classList.add('claw-open');
+            setStatus("Đang hạ càng gắp xuống...");
+
+            let candidate = null;
+            pitPlushies.forEach(p => {
+                if (Math.abs(p.x - clawX) <= 34) candidate = p;
+            });
+
+            const dropDepth = candidate ? Math.max(150, 260 - candidate.bottom) : 265;
+            await animateCableHeight(28, dropDepth, 600);
+
+            clawHead.classList.remove('claw-open');
+            clawHead.classList.add('claw-grab');
+            await window.setTimeout(() => {}, 250);
+
+            if (!candidate || Math.abs(candidate.x - clawX) > 28) {
+                playTone('slip');
+                setStatus("Gắp trượt rồi!");
+                await animateCableHeight(dropDepth, 28, 550);
+                clawHead.classList.remove('claw-grab');
+                isClawBusy = false;
+                return;
+            }
+
+            activeGrabbedPlush = candidate;
+            candidate.el.classList.add('hidden');
+            heldSlot.innerHTML = `<div class="plush-struggle">${create3DPlushSVG(candidate.model, 'held', 70, candidate.gift)}</div>`;
+
+            await animateCableHeight(dropDepth, 28, 700);
+            await animateClawHorizontal(clawX, CHUTE_CENTER_X, 800);
+            openGrammarQuizForPlush(candidate);
+        }
+
+        function animateCableHeight(fromH, toH, duration) {
+            return new Promise(res => {
+                const c = document.getElementById('clawCable');
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min(1, (now - start) / duration);
+                    c.style.height = `${fromH + (toH - fromH) * p}px`;
+                    if (p < 1) requestAnimationFrame(step); else res();
+                }
+                requestAnimationFrame(step);
+            });
+        }
+
+        function animateClawHorizontal(fromX, toX, duration) {
+            return new Promise(res => {
+                const a = document.getElementById('clawAssembly');
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min(1, (now - start) / duration);
+                    a.style.left = `${fromX + (toX - fromX) * p}px`;
+                    if (p < 1) requestAnimationFrame(step); else res();
+                }
+                requestAnimationFrame(step);
+            });
+        }
+
+        /* ==============================================================
+           6. CÂU HỎI & TRẢ THƯỞNG
+           ============================================================== */
+        function openGrammarQuizForPlush(plushObj) {
+            const modal = document.getElementById('quizModal');
+            const qItem = questions[Math.floor(Math.random() * questions.length)];
+
+            document.getElementById('quizPlushPreview').innerHTML = create3DPlushSVG(plushObj.model, 'quiz', 56);
+            document.getElementById('quizGiftBadge').innerText = plushObj.gift.label;
+            document.getElementById('quizQuestionText').innerText = qItem.q;
+
+            const fb = document.getElementById('quizFeedbackBox');
+            fb.classList.add('hidden');
+
+            const optBox = document.getElementById('quizOptionsBox');
+            optBox.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            qItem.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-pink-200 hover:border-pink-500 bg-pink-50/60 font-extrabold text-gray-800 transition flex items-center gap-3 shadow-sm';
+                btn.innerHTML = `<span class="w-8 h-8 rounded-xl bg-pink-500 text-white font-title font-bold flex items-center justify-center shrink-0">${letters[idx]}</span><span>${opt}</span>`;
+                btn.onclick = () => checkGrammarAnswer(idx, qItem.answer, btn, optBox);
+                optBox.appendChild(btn);
+            });
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function checkGrammarAnswer(chosenIdx, rightIdx, btn, optBox) {
+            Array.from(optBox.children).forEach(b => b.disabled = true);
+            const fb = document.getElementById('quizFeedbackBox');
+            fb.classList.remove('hidden');
+
+            if (chosenIdx === rightIdx) {
+                playTone('win');
+                triggerMegaFireworks();
+
+                const bonus = activeGrabbedPlush ? activeGrabbedPlush.gift.bonus : 10;
+                teamScores[activeTeam] += bonus;
+                document.getElementById('scoreRed').innerText = teamScores.red;
+                document.getElementById('scoreBlue').innerText = teamScores.blue;
+
+                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-100 font-extrabold text-emerald-900 flex items-center gap-3';
+                fb.className = 'mt-4 p-3.5 rounded-2xl text-center font-extrabold text-sm bg-emerald-100 text-emerald-800';
+                fb.innerText = `🎉 CHÍNH XÁC! Pháo hoa chúc mừng ${activeTeam === 'red' ? 'Đội Đỏ' : 'Đội Xanh'}!`;
+
+                setTimeout(async () => {
+                    document.getElementById('quizModal').classList.add('hidden');
+                    document.getElementById('quizModal').classList.remove('flex');
+                    await dropPlushIntoChuteAndOut();
+                }, 1400);
+            } else {
+                playTone('slip');
+                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-100 font-extrabold text-rose-900 flex items-center gap-3';
+                optBox.children[rightIdx].className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-extrabold text-emerald-800 flex items-center gap-3';
+                fb.className = 'mt-4 p-3.5 rounded-2xl text-center font-extrabold text-sm bg-rose-100 text-rose-700';
+                fb.innerText = '😢 Tiếc quá chưa đúng rồi!';
+
+                setTimeout(() => {
+                    document.getElementById('quizModal').classList.add('hidden');
+                    document.getElementById('quizModal').classList.remove('flex');
+                    document.getElementById('clawHead').classList.remove('claw-grab');
+                    document.getElementById('clawHeldSlot').innerHTML = '';
+                    if (activeGrabbedPlush) activeGrabbedPlush.el.classList.remove('hidden');
+                    activeGrabbedPlush = null;
+                    isClawBusy = false;
+                }, 1600);
+            }
+        }
+
+        async function dropPlushIntoChuteAndOut() {
+            const heldSlot = document.getElementById('clawHeldSlot');
+            if (heldSlot.firstElementChild) heldSlot.firstElementChild.className = 'animate-chute-drop';
+            await window.setTimeout(() => {}, 650);
+
+            heldSlot.innerHTML = '';
+            pitPlushies = pitPlushies.filter(p => p.id !== activeGrabbedPlush.id);
+            activeGrabbedPlush.el.remove();
+
+            pendingPrize = activeGrabbedPlush;
+            activeGrabbedPlush = null;
+            renderPendingPrizeInTray();
+
+            setStatus(`🎁 Thú đã rơi xuống Cửa Lấy Quà! Bấm nhận về rổ của ${activeTeam === 'red' ? 'Đội Đỏ' : 'Đội Xanh'}!`);
+            await animateClawHorizontal(CHUTE_CENTER_X, clawX, 550);
+            isClawBusy = false;
+        }
+
+        function renderPendingPrizeInTray() {
+            const tray = document.getElementById('prizeTraySlot');
+            document.getElementById('btnClaimRed').classList.remove('hidden');
+            document.getElementById('btnClaimBlue').classList.remove('hidden');
+
+            if (!pendingPrize) {
+                tray.innerHTML = `<span class="text-[11px] text-slate-400 font-bold text-center px-1">Thả thú xuống đây</span>`;
+                document.getElementById('btnClaimRed').classList.add('hidden');
+                document.getElementById('btnClaimBlue').classList.add('hidden');
+                return;
+            }
+
+            tray.innerHTML = `<div class="transform scale-90">${create3DPlushSVG(pendingPrize.model, 'tray', 52, pendingPrize.gift)}</div>`;
+        }
+
+        function assignPrizeToTeam(team) {
+            if (!pendingPrize) return;
+            teamBaskets[team].push(pendingPrize);
+            pendingPrize = null;
+            renderPendingPrizeInTray();
+            renderTeamBaskets();
+            setStatus(`🧺 Đã chuyển thú vào rổ của ${team === 'red' ? 'Đội Đỏ 🔴' : 'Đội Xanh 🔵'}!`);
+        }
+
+        function renderTeamBaskets() {
+            document.getElementById('countRed').innerText = teamBaskets.red.length;
+            document.getElementById('countBlue').innerText = teamBaskets.blue.length;
+
+            const gridRed = document.getElementById('basketRedGrid');
+            gridRed.innerHTML = teamBaskets.red.length === 0 ? `<span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>` : '';
+            teamBaskets.red.forEach((item, idx) => {
+                gridRed.innerHTML += `<div class="flex justify-center">${create3DPlushSVG(item.model, 'red_' + idx, 38)}</div>`;
+            });
+
+            const gridBlue = document.getElementById('basketBlueGrid');
+            gridBlue.innerHTML = teamBaskets.blue.length === 0 ? `<span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>` : '';
+            teamBaskets.blue.forEach((item, idx) => {
+                gridBlue.innerHTML += `<div class="flex justify-center">${create3DPlushSVG(item.model, 'blue_' + idx, 38)}</div>`;
+            });
+        }
+
+        function setStatus(text) { document.getElementById('statusText').innerText = text; }
+
+        /* ==============================================================
+           7. BỘ XỬ LÝ THỊ GIÁC MÁY TÍNH THUẦN (PURE WEBCAM VISION ENGINE)
+           Không phụ thuộc MediaPipe / File ngoài - Chạy tức thì 100%
+           ============================================================== */
+        let lastGrabTriggerTime = 0;
+
+        function updateThumbHUD(percent) {
+            const bar = document.getElementById('thumbBar');
+            const val = document.getElementById('thumbVal');
+            const p = Math.max(0, Math.min(100, Math.round(percent)));
+            bar.style.width = `${p}%`;
+            val.innerText = `${p}%`;
+
+            if (p >= 55) {
+                bar.className = 'h-full bg-emerald-400 transition-all duration-75';
+            } else {
+                bar.className = 'h-full bg-amber-400 transition-all duration-75';
+            }
+        }
+
+        function triggerThumbsUpGrab() {
+            const now = Date.now();
+            if (now - lastGrabTriggerTime > 3000 && !isClawBusy) {
+                lastGrabTriggerTime = now;
+
+                const alertBox = document.getElementById('thumbLockAlert');
+                alertBox.classList.remove('hidden');
+                alertBox.classList.add('flex');
+                setTimeout(() => {
+                    alertBox.classList.add('hidden');
+                    alertBox.classList.remove('flex');
+                }, 700);
+
+                startClawSequence();
+            }
+        }
+
+        function startPureVisionEngine(videoEl, canvasEl) {
+            const ctx = canvasEl.getContext('2d');
+            canvasEl.width = 160;
+            canvasEl.height = 120;
+
+            function processFrame() {
+                if (!videoEl.videoWidth) {
+                    requestAnimationFrame(processFrame);
+                    return;
+                }
+
+                ctx.drawImage(videoEl, 0, 0, 160, 120);
+                const frame = ctx.getImageData(0, 0, 160, 120);
+                const data = frame.data;
+
+                let skinPixelsX = 0;
+                let skinPixelsY = 0;
+                let skinCount = 0;
+                let topY = 120;
+                let topX = 80;
+
+                // Thuật toán nhận diện phổ màu da người thực tế
+                for (let i = 0; i < data.length; i += 16) {
+                    const r = data[i], g = data[i + 1], b = data[i + 2];
+                    if (r > 90 && g > 40 && b > 20 && (r - g) > 15 && r > b) {
+                        const pxIdx = i / 4;
+                        const x = pxIdx % 160;
+                        const y = Math.floor(pxIdx / 160);
+                        skinPixelsX += x;
+                        skinPixelsY += y;
+                        skinCount++;
+
+                        if (y < topY) {
+                            topY = y;
+                            topX = x;
+                        }
+                    }
+                }
+
+                if (skinCount > 70) {
+                    // 1. TÍNH TOÁN VỊ TRÍ X ĐỂ DI CHUYỂN CÀNG GẮP
+                    const avgX = (skinPixelsX / skinCount) / 160;
+                    const avgY = (skinPixelsY / skinCount);
+                    const cabinetW = document.getElementById('machineCabinet').clientWidth;
+                    const targetX = 145 + (1.0 - avgX) * (cabinetW - 185);
+                    
+                    // Di chuyển mượt mà (Smoothing)
+                    clawX = clawX * 0.72 + targetX * 0.28;
+                    renderClawX();
+
+                    const coordEl = document.getElementById('handCoordText');
+                    if (avgX < 0.4) coordEl.innerText = "Vị trí: Phải ➡️";
+                    else if (avgX > 0.6) coordEl.innerText = "Vị trí: Trái ⬅️";
+                    else coordEl.innerText = "Vị trí: Giữa ⏺️";
+
+                    // 2. TÍNH TOÁN CỬ CHỈ GIƠ NGÓN CÁI (THUMBS UP)
+                    // Khoảng cách nhô cao từ đỉnh ngón cái (topY) so với trọng tâm bàn tay (avgY)
+                    const protrusion = avgY - topY; // Càng vươn ngón cái lên cao, protrusion càng lớn
+                    const thumbScore = Math.min(100, Math.max(0, (protrusion - 18) * 4.5));
+                    updateThumbHUD(thumbScore);
+
+                    if (thumbScore >= 55) {
+                        document.getElementById('gestureText').innerHTML = '<span class="text-emerald-400 font-black">👍 ĐÃ NHẬN: GẮP!</span>';
+                        triggerThumbsUpGrab();
+                    } else {
+                        document.getElementById('gestureText').innerHTML = '<span class="text-cyan-300">🖐️ Lướt tay (Giơ 👍 để gắp)</span>';
+                    }
+                } else {
+                    document.getElementById('gestureText').innerText = "🔍 Đang tìm bàn tay...";
+                    updateThumbHUD(0);
+                }
+
+                requestAnimationFrame(processFrame);
+            }
+            processFrame();
+        }
+
+        async function initCamera() {
+            const videoElement = document.getElementById('webcam');
+            const canvasElement = document.getElementById('output_canvas');
+            const badge = document.getElementById('aiEngineBadge');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+                });
+                videoElement.srcObject = stream;
+                await videoElement.play();
+                badge.innerText = "🟢 Vision Tracking Đang Chạy";
+                startPureVisionEngine(videoElement, canvasElement);
+            } catch (err) {
+                console.error("Lỗi camera:", err);
+                badge.innerText = "⚠️ Chưa cấp quyền Camera";
+                badge.className = "bg-rose-100 text-rose-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-rose-400";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            syncQuestionStorage();
+            spawnPlushiePile();
+            renderClawX();
+            initCamera();
+        });
+
+        /* ==============================================================
+           8. QUẢN LÝ CÂU HỎI
+           ============================================================== */
+        function openQuestionManager() {
+            const box = document.getElementById('questionListBox');
+            box.innerHTML = questions.map((q, i) => `<div class="bg-gray-50 p-3 rounded-xl border text-xs mb-2"><b>${i+1}. ${q.q}</b></div>`).join('');
+            document.getElementById('managerModal').classList.remove('hidden');
+            document.getElementById('managerModal').classList.add('flex');
+        }
+        function closeQuestionManager() { document.getElementById('managerModal').classList.add('hidden'); document.getElementById('managerModal').classList.remove('flex'); }
+        function addNewQuestion() {
+            const q = document.getElementById('inputQ').value.trim();
+            const a = document.getElementById('inputA').value.trim();
+            const b = document.getElementById('inputB').value.trim();
+            const c = document.getElementById('inputC').value.trim();
+            const d = document.getElementById('inputD').value.trim();
+            const ans = parseInt(document.getElementById('inputAns').value, 10);
+            if (!q || !a || !b || !c || !d) return;
+            questions.unshift({ q, options: [a, b, c, d], answer: ans });
+            syncQuestionStorage();
+            closeQuestionManager();
+        }
+        function restoreSampleQuestions() { questions = [...SAMPLE_QUESTIONS]; syncQuestionStorage(); closeQuestionManager(); }
+    </script>
+</body>
+</html>
