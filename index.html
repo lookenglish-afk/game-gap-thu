@@ -41,7 +41,6 @@
             letter-spacing: 0.01em;
         }
 
-        /* 3D Arcade Cabinet Styling */
         .arcade-cabinet {
             box-shadow: 
                 0 22px 50px rgba(219, 39, 119, 0.32),
@@ -55,7 +54,6 @@
             pointer-events: none;
         }
 
-        /* 3D Tactile Buttons */
         .btn-3d-pink {
             transition: all 0.12s ease;
             box-shadow: 0 5px 0 #9d174d, 0 8px 15px rgba(0,0,0,0.18);
@@ -83,7 +81,6 @@
             box-shadow: 0 2px 0 #b45309, 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        /* Active Team Turn Glow */
         .team-active-a {
             box-shadow: 0 0 0 4px #f43f5e, 0 10px 25px rgba(244, 63, 94, 0.35);
             transform: translateY(-2px) scale(1.03);
@@ -101,7 +98,6 @@
             animation: floatSlow 2.6s ease-in-out infinite;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -121,11 +117,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-2 sm:p-4 text-slate-800">
 
-    <!-- HEADER: Title, Game Mode Switcher, 1P/2-Team Scoreboards & Teacher Panel -->
+    <!-- HEADER -->
     <header class="max-w-7xl w-full mx-auto bg-white/95 backdrop-blur-md px-4 py-3 rounded-[2rem] shadow-lg border-4 border-pink-400 mb-3">
         <div class="flex flex-wrap items-center justify-between gap-3">
             
-            <!-- Game Logo & Tier Legend -->
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-400 to-pink-500 flex items-center justify-center text-white text-2xl shadow-md border-2 border-white">
                     <i class="fa-solid fa-paw"></i>
@@ -135,20 +130,19 @@
                         3D Teddy Claw Machine • English Quiz
                     </h1>
                     <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                        <span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">💀 0 PTS Decoy</span>
+                        <span class="bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-extrabold" id="bearSyncStatusText">
+                            🧸 <span id="bearCountDisplay">0</span> Chú gấu sẵn sàng
+                        </span>
                         <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">🟢 +5~15 PTS</span>
                         <span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">🔵 +25~40 PTS</span>
                         <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">🟣 +60 PTS</span>
                         <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">👑 +100 PTS</span>
-                        <span class="bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">🌈 ? PTS Mystery</span>
                     </div>
                 </div>
             </div>
 
             <!-- Controls & Scoreboards -->
             <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                
-                <!-- 1 Player / 2 Teams Mode Toggle -->
                 <div class="bg-slate-100 p-1 rounded-2xl border-2 border-slate-200 flex items-center">
                     <button id="mode1PBtn" onclick="setGameMode('1P')" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition bg-pink-500 text-white shadow">
                         <i class="fa-solid fa-user mr-1"></i> 1 PLAYER
@@ -158,7 +152,6 @@
                     </button>
                 </div>
 
-                <!-- 1 Player Scoreboard -->
                 <div id="scoreboard1P" class="flex items-center gap-2">
                     <div class="flex items-center gap-2 bg-amber-50 border-2 border-amber-400 px-3.5 py-1 rounded-2xl">
                         <i class="fa-solid fa-star text-amber-500 text-lg"></i>
@@ -176,9 +169,7 @@
                     </div>
                 </div>
 
-                <!-- 2 Teams Scoreboard (Team A vs Team B) -->
                 <div id="scoreboard2Teams" class="hidden items-center gap-2 sm:gap-3">
-                    <!-- Team A -->
                     <div id="teamACard" onclick="manualSwitchTurn('A')" class="cursor-pointer transition-all flex items-center gap-2.5 bg-rose-50 border-2 border-rose-300 px-3.5 py-1 rounded-2xl team-active-a" title="Click to switch turn to Team A">
                         <div class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center font-title font-bold text-base shadow">
                             A
@@ -194,7 +185,6 @@
 
                     <span class="font-title font-extrabold text-slate-400 text-sm">VS</span>
 
-                    <!-- Team B -->
                     <div id="teamBCard" onclick="manualSwitchTurn('B')" class="cursor-pointer transition-all flex items-center gap-2.5 bg-sky-50 border-2 border-sky-300 px-3.5 py-1 rounded-2xl opacity-80" title="Click to switch turn to Team B">
                         <div class="w-8 h-8 rounded-xl bg-sky-500 text-white flex items-center justify-center font-title font-bold text-base shadow">
                             B
@@ -209,11 +199,10 @@
                     </div>
                 </div>
 
-                <!-- Teacher Panel, Reset & Sound Buttons -->
                 <div class="flex items-center gap-2">
                     <button onclick="openTeacherModal()" class="btn-3d-pink bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-title font-bold px-3.5 py-2 rounded-2xl text-xs sm:text-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-sliders"></i>
-                        <span>TEACHER PANEL (<span id="questionCountBadge">12</span>)</span>
+                        <span>BỘ CÂU HỎI (<span id="questionCountBadge">0</span>)</span>
                     </button>
 
                     <button onclick="resetScores()" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-slate-300 flex items-center justify-center text-sm transition" title="Reset All Scores">
@@ -229,21 +218,21 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT: 3D Teddy Claw Machine + AI Hand Control & Prize Shelf -->
+    <!-- MAIN CONTENT -->
     <main class="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start my-auto">
         
-        <!-- LEFT COLUMN (7/12): 3D ARCADE CLAW MACHINE -->
+        <!-- LEFT COLUMN: CLAW MACHINE -->
         <div class="lg:col-span-7 flex flex-col items-center">
             <div class="w-full max-w-[620px] bg-gradient-to-b from-pink-400 via-pink-500 to-rose-600 rounded-[2.5rem] p-4 sm:p-5 arcade-cabinet relative">
                 
-                <!-- Arcade LED Top Marquee -->
+                <!-- LED Top Marquee -->
                 <div class="bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-300 rounded-t-3xl py-2 px-4 mb-3 border-4 border-white shadow-inner flex items-center justify-between">
                     <div class="flex gap-1.5">
                         <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
                         <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                         <span class="w-3 h-3 rounded-full bg-sky-500"></span>
                     </div>
-                    <div id="cabinetTopBanner" class="font-title font-extrabold text-pink-700 tracking-wide text-sm sm:text-base uppercase flex items-center gap-1.5">
+                    <div class="font-title font-extrabold text-pink-700 tracking-wide text-sm sm:text-base uppercase flex items-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-500"></i>
                         <span id="cabinetBannerText">3D HUGGING TEDDY CLAW MACHINE</span>
                         <i class="fa-solid fa-crown text-amber-500"></i>
@@ -255,31 +244,42 @@
                     </div>
                 </div>
 
-                <!-- Glass Display Window with 3D Teddy Plushies Canvas -->
+                <!-- Glass Display Window -->
                 <div class="relative w-full aspect-[4/3] bg-gradient-to-b from-indigo-950 via-purple-900 to-pink-900 rounded-2xl overflow-hidden border-4 border-white shadow-inner">
                     <canvas id="clawCanvas" class="w-full h-full block"></canvas>
                     
-                    <!-- Glass Reflection Overlay -->
                     <div class="inset-0 absolute glass-reflection"></div>
 
-                    <!-- Team Turn Pill Badge Inside Machine -->
+                    <!-- Empty Machine Notice Overlay -->
+                    <div id="emptyMachineOverlay" class="hidden absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-15">
+                        <div class="w-16 h-16 rounded-3xl bg-pink-500/20 border-2 border-pink-400 flex items-center justify-center text-pink-300 text-3xl mb-3">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <h3 class="text-white font-title font-extrabold text-lg sm:text-xl mb-1">MÁY ĐANG TRỐNG GẤU!</h3>
+                        <p class="text-pink-100 text-xs sm:text-sm max-w-sm mb-4">
+                            Bạn đã xoá hết câu hỏi nên không có chú gấu nào trong máy. Hãy mở bảng câu hỏi để tạo thêm nhé!
+                        </p>
+                        <button onclick="openTeacherModal()" class="btn-3d-pink bg-pink-500 hover:bg-pink-400 text-white font-title font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> THÊM CÂU HỎI & THÊM GẤU
+                        </button>
+                    </div>
+
                     <div id="inGameTurnPill" class="hidden absolute top-3 right-3 bg-rose-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5">
                         <i class="fa-solid fa-paw"></i> TURN: TEAM A
                     </div>
 
-                    <!-- Floating Toast Notification Inside Machine -->
                     <div id="machineToast" class="absolute top-12 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-5 py-2 rounded-full shadow-xl border-2 border-pink-400 font-title font-bold text-pink-600 text-sm sm:text-base transition-all duration-300 opacity-0 pointer-events-none scale-90 whitespace-nowrap z-20">
                         Ready to grab a cute 3D Teddy Bear!
                     </div>
                 </div>
 
-                <!-- Physical Arcade Control Deck -->
+                <!-- Arcade Control Deck -->
                 <div class="mt-4 bg-pink-800/60 rounded-2xl p-3 border-2 border-pink-300/60 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
-                        <button id="btnLeft" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base" title="Move Left (Left Arrow / A)">
+                        <button id="btnLeft" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base">
                             <i class="fa-solid fa-caret-left text-lg"></i> LEFT
                         </button>
-                        <button id="btnRight" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base" title="Move Right (Right Arrow / D)">
+                        <button id="btnRight" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base">
                             RIGHT <i class="fa-solid fa-caret-right text-lg"></i>
                         </button>
                     </div>
@@ -299,10 +299,9 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN (5/12): AI HAND TRACKING CAMERA & TEDDY PRIZE COLLECTION -->
+        <!-- RIGHT COLUMN: WEBCAM & COLLECTION -->
         <div class="lg:col-span-5 flex flex-col gap-4">
             
-            <!-- AI HAND GESTURE WEBCAM CARD (NON-MIRRORED) -->
             <div class="bg-white/95 backdrop-blur-md rounded-[2rem] p-4 sm:p-5 shadow-xl border-4 border-indigo-400">
                 <div class="flex items-center justify-between mb-2.5">
                     <div class="flex items-center gap-2">
@@ -316,26 +315,23 @@
                     </button>
                 </div>
 
-                <!-- Webcam Viewport (Horizontally Flipped to Eliminate Mirror Effect) -->
                 <div class="relative w-full aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-inner">
                     <video id="webcamVideo" class="hidden" playsinline></video>
                     <canvas id="webcamCanvas" class="w-full h-full object-cover"></canvas>
 
-                    <!-- Camera Standby Overlay -->
                     <div id="camOverlay" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center">
                         <div class="w-14 h-14 rounded-full bg-indigo-500/20 border-2 border-indigo-400 flex items-center justify-center text-indigo-300 text-2xl mb-2.5">
                             <i class="fa-solid fa-hand-point-up animate-bounce"></i>
                         </div>
                         <h3 class="text-white font-title font-bold text-base mb-1">Touchless AI Hand Tracking!</h3>
                         <p class="text-slate-300 text-xs max-w-xs mb-3.5 leading-relaxed">
-                            Move your hand <b class="text-sky-300">Left / Right</b> in real life to steer the claw (true direction, no mirror confusion). Show a <b class="text-amber-300">Thumbs Up 👍</b> to drop the claw!
+                            Di chuyển tay <b class="text-sky-300">Trái / Phải</b> để lái càng gắp. Giơ <b class="text-amber-300">Ngón Cái 👍</b> để thả càng!
                         </p>
                         <button onclick="startCamera()" id="startCamMainBtn" class="btn-3d-pink bg-pink-500 hover:bg-pink-400 text-white font-title font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-camera"></i> ENABLE AI WEBCAM
+                            <i class="fa-solid fa-camera"></i> KÍCH HOẠT CAMERA AI
                         </button>
                     </div>
 
-                    <!-- Live Gesture Status Bar -->
                     <div class="absolute bottom-2 inset-x-2 bg-slate-900/85 backdrop-blur-md text-white px-3 py-1.5 rounded-xl flex items-center justify-between border border-white/15">
                         <span class="text-xs text-slate-300 font-semibold">AI Status:</span>
                         <span id="gestureStatusBadge" class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
@@ -344,40 +340,39 @@
                     </div>
                 </div>
 
-                <!-- Gesture Guide Cards -->
                 <div class="grid grid-cols-3 gap-2 mt-3 text-center">
                     <div class="bg-sky-50 border border-sky-200 rounded-xl p-2">
                         <div class="text-base">👈 / 👉</div>
-                        <div class="text-xs font-title font-bold text-sky-800">Hand Left / Right</div>
-                        <div class="text-[11px] text-slate-500 font-semibold">Move Claw</div>
+                        <div class="text-xs font-title font-bold text-sky-800">Tay Trái / Phải</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Di chuyển càng</div>
                     </div>
                     <div class="bg-amber-50 border border-amber-200 rounded-xl p-2">
                         <div class="text-base">👍</div>
-                        <div class="text-xs font-title font-bold text-amber-800">Thumbs Up</div>
-                        <div class="text-[11px] text-slate-500 font-semibold">Drop Claw</div>
+                        <div class="text-xs font-title font-bold text-amber-800">Ngón tay cái</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Thả gắp gấu</div>
                     </div>
                     <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2">
                         <div class="text-base">🧸✨</div>
-                        <div class="text-xs font-title font-bold text-emerald-800">Answer Quiz</div>
-                        <div class="text-[11px] text-slate-500 font-semibold">Win Aura Teddy!</div>
+                        <div class="text-xs font-title font-bold text-emerald-800">Trả lời đúng</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Rinh gấu về!</div>
                     </div>
                 </div>
             </div>
 
-            <!-- TEDDY COLLECTION SHELF & RESPAWN BUTTON -->
+            <!-- COLLECTION -->
             <div class="bg-white/95 backdrop-blur-md rounded-[2rem] p-4 sm:p-5 shadow-xl border-4 border-pink-400">
                 <div class="flex items-center justify-between mb-2.5">
                     <h2 class="font-title font-extrabold text-pink-700 text-lg flex items-center gap-2">
-                        <i class="fa-solid fa-trophy text-amber-500"></i> Teddy Bear Collection
+                        <i class="fa-solid fa-trophy text-amber-500"></i> Bộ Sưu Tập Gấu Đã Gắp
                     </h2>
-                    <button onclick="resetPlushPool()" class="text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5" title="Respawn a fresh batch of 3D Teddy Bears">
-                        <i class="fa-solid fa-rotate"></i> RESPAWN TEDDIES
+                    <button onclick="repopulatePlushiesFromQuestions()" class="text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5" title="Sắp xếp lại gấu theo bộ câu hỏi">
+                        <i class="fa-solid fa-rotate"></i> TẢI LẠI GẤU
                     </button>
                 </div>
 
                 <div id="collectionGrid" class="min-h-[86px] max-h-[145px] overflow-y-auto bg-pink-50/80 border-2 border-dashed border-pink-300 rounded-2xl p-2.5 flex flex-wrap gap-2 items-center justify-center">
                     <p id="emptyCollectionText" class="text-xs font-semibold text-slate-400 text-center px-2">
-                        No teddy bears collected yet! Grab a hugging teddy bear and answer the English question to win points! Watch out for 0 PTS decoys! 🧸💖
+                        Chưa có gấu nào được gắp! Mỗi chú gấu tương ứng với 1 câu hỏi tiếng Anh của bạn. Hãy nhắm thật chuẩn và trả lời nhé! 🧸💖
                     </p>
                 </div>
             </div>
@@ -385,14 +380,11 @@
         </div>
     </main>
 
-    <!-- MODAL 1: ENGLISH QUIZ MODAL WHEN A TEDDY BEAR IS GRABBED -->
+    <!-- MODAL 1: QUIZ MODAL -->
     <div id="quizModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-[2.2rem] max-w-lg w-full p-6 sm:p-7 shadow-2xl border-4 border-pink-400 relative overflow-hidden">
-            
-            <!-- Decorative Corner Glow -->
             <div id="quizAuraCorner" class="absolute -top-12 -right-12 w-36 h-36 rounded-full opacity-25 pointer-events-none bg-amber-400"></div>
 
-            <!-- Grabbed Teddy Info & Point Badge -->
             <div class="flex items-center justify-between gap-3 mb-4 relative z-10">
                 <div class="flex items-center gap-3.5">
                     <div id="quizPlushAvatar" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-50 to-pink-100 border-2 border-pink-300 flex items-center justify-center shadow-md floating-avatar relative">
@@ -401,57 +393,50 @@
                     <div>
                         <div class="flex flex-wrap items-center gap-1.5">
                             <span id="quizRarityBadge" class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                ⭐ Legendary Teddy (+100 PTS)
+                                ⭐ Gấu Bông (+25 PTS)
                             </span>
                             <span id="quizTurnTeamBadge" class="hidden text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-rose-500 text-white">
                                 TEAM A
                             </span>
                         </div>
                         <h3 id="quizPlushName" class="text-xl font-title font-extrabold text-slate-800 mt-1">
-                            Honey Teddy is on the claw!
+                            Honey Teddy đang trên càng gắp!
                         </h3>
                     </div>
                 </div>
             </div>
 
-            <!-- Question Box -->
             <div class="bg-indigo-50/90 border-2 border-indigo-200 rounded-2xl p-4 mb-4 relative z-10">
                 <div class="flex items-center justify-between mb-1">
                     <span id="quizTopicBadge" class="text-xs font-bold text-indigo-600 uppercase tracking-wide">
-                        <i class="fa-solid fa-book-open mr-1"></i> English Challenge
+                        <i class="fa-solid fa-book-open mr-1"></i> Thử Thách Tiếng Anh
                     </span>
                     <span id="quizPointsText" class="text-xs font-extrabold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
-                        🎁 Reward: +25 PTS
+                        🎁 Thưởng: +25 PTS
                     </span>
                 </div>
                 <p id="quizQuestionText" class="text-base sm:text-lg font-title font-bold text-slate-800 leading-snug mt-1">
-                    What is the English word for "Con Gấu"?
+                    Question goes here?
                 </p>
             </div>
 
-            <!-- 4 Answer Choices (A, B, C, D) -->
-            <div id="quizOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 relative z-10">
-                <!-- Populated dynamically via JS -->
-            </div>
-
-            <!-- Answer Explanation & Feedback Box -->
+            <div id="quizOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 relative z-10"></div>
             <div id="quizFeedbackBox" class="hidden rounded-2xl p-3.5 text-sm font-semibold mb-1 relative z-10"></div>
         </div>
     </div>
 
-    <!-- MODAL 2: TEACHER PANEL (QUESTION BANK & DECOY SETTINGS) -->
+    <!-- MODAL 2: TEACHER PANEL -->
     <div id="teacherModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-5">
         <div class="bg-white rounded-[2rem] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-indigo-400 overflow-hidden">
             
-            <!-- Modal Header -->
             <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-6 py-4 text-white flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-chalkboard-user"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl font-title font-extrabold leading-none">Teacher Panel • Question & Difficulty Manager</h2>
-                        <p class="text-xs text-indigo-100 mt-0.5">Auto-saved to browser LocalStorage • Customize questions & 0-Point Decoy Bears</p>
+                        <h2 class="text-xl font-title font-extrabold leading-none">Quản Lý Câu Hỏi & Số Lượng Gấu</h2>
+                        <p class="text-xs text-indigo-100 mt-0.5">Số lượng gấu trong máy luôn bằng chính xác số câu hỏi bạn đặt!</p>
                     </div>
                 </div>
                 <button onclick="closeTeacherModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center text-lg transition">
@@ -459,91 +444,64 @@
                 </button>
             </div>
 
-            <!-- Scrollable Modal Body -->
             <div class="p-5 overflow-y-auto space-y-5 flex-1">
-
-                <!-- Difficulty & 0-Point Decoy Settings -->
-                <div class="bg-amber-50/80 border-2 border-amber-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h3 class="font-title font-bold text-amber-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-masks-theater text-amber-600"></i> 0-Point Decoy & Mystery Teddy Settings
-                        </h3>
-                        <p class="text-xs text-slate-600">Add tricky 0-Point Decoy Teddies to challenge students' aim!</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-300">
-                            <label class="text-xs font-bold text-slate-700">0-PTS Decoy Count:</label>
-                            <select id="decoyCountSelect" onchange="updateDecoySettings()" class="text-xs font-extrabold text-amber-800 outline-none bg-transparent">
-                                <option value="1">1 Decoy Bear</option>
-                                <option value="2" selected>2 Decoy Bears</option>
-                                <option value="3">3 Decoy Bears</option>
-                                <option value="4">4 Decoy Bears (Hard!)</option>
-                            </select>
-                        </div>
-                        <label class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-300 cursor-pointer text-xs font-bold text-slate-700">
-                            <input id="disguiseDecoyCheckbox" type="checkbox" onchange="updateDecoySettings()" class="accent-pink-500 w-4 h-4">
-                            <span>Hide "0 PTS" as "? PTS"</span>
-                        </label>
-                    </div>
-                </div>
-                
                 <!-- Add / Edit Single Question Form -->
                 <div class="bg-indigo-50/70 border-2 border-indigo-200 rounded-2xl p-4">
                     <h3 id="formTitleText" class="font-title font-bold text-indigo-900 text-base mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-plus text-indigo-600"></i> Add New Question
+                        <i class="fa-solid fa-circle-plus text-indigo-600"></i> Thêm Câu Hỏi Mới (+1 Chú Gấu vào tủ)
                     </h3>
                     <input type="hidden" id="editQuestionIndex" value="-1">
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                         <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Question Prompt *</label>
-                            <input id="inpQuestion" type="text" placeholder="e.g., What is the past tense of 'GO'?" class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Nội dung câu hỏi *</label>
+                            <input id="inpQuestion" type="text" placeholder="Ví dụ: What is the past tense of 'GO'?" class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Category / Topic (Optional)</label>
-                            <input id="inpTopic" type="text" placeholder="Vocabulary / Grammar..." class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Chủ đề (Vocabulary / Grammar...)</label>
+                            <input id="inpTopic" type="text" placeholder="Grammar" class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Option A *</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Lựa chọn A *</label>
                             <input id="inpOptA" type="text" placeholder="Went" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Option B *</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Lựa chọn B *</label>
                             <input id="inpOptB" type="text" placeholder="Gone" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Option C *</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Lựa chọn C *</label>
                             <input id="inpOptC" type="text" placeholder="Goed" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Option D *</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Lựa chọn D *</label>
                             <input id="inpOptD" type="text" placeholder="Going" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Correct Option *</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Đáp án đúng *</label>
                             <select id="inpCorrect" class="w-full px-3 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-bold text-indigo-900 bg-white">
-                                <option value="0">Option A</option>
-                                <option value="1">Option B</option>
-                                <option value="2">Option C</option>
-                                <option value="3">Option D</option>
+                                <option value="0">Đáp án A</option>
+                                <option value="1">Đáp án B</option>
+                                <option value="2">Đáp án C</option>
+                                <option value="3">Đáp án D</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Short Explanation (Optional)</label>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Giải thích (Tùy chọn)</label>
                             <input id="inpExplanation" type="text" placeholder="The past simple form of Go is Went." class="w-full px-3 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
                         </div>
                         <div class="flex gap-2">
                             <button onclick="saveSingleQuestion()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-title font-bold py-2 px-4 rounded-xl text-sm transition shadow">
-                                <i class="fa-solid fa-floppy-disk mr-1"></i> <span id="saveQuestionBtnText">SAVE QUESTION</span>
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> <span id="saveQuestionBtnText">LƯU CÂU HỎI</span>
                             </button>
                             <button id="cancelEditBtn" onclick="resetQuestionForm()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm transition">
-                                CANCEL
+                                HUỶ
                             </button>
                         </div>
                     </div>
@@ -553,16 +511,16 @@
                 <!-- Bulk Import Tool -->
                 <details class="bg-pink-50/80 border-2 border-pink-200 rounded-2xl p-3.5">
                     <summary class="font-title font-bold text-pink-900 text-sm cursor-pointer flex items-center justify-between">
-                        <span><i class="fa-solid fa-file-import text-pink-600 mr-1.5"></i> Bulk Import Questions (Copy & Paste)</span>
-                        <span class="text-xs font-semibold text-pink-700">Click to expand ▼</span>
+                        <span><i class="fa-solid fa-file-import text-pink-600 mr-1.5"></i> Nhập nhanh hàng loạt câu hỏi (Copy & Paste)</span>
+                        <span class="text-xs font-semibold text-pink-700">Bấm mở ra ▼</span>
                     </summary>
                     <div class="mt-3 space-y-2">
                         <p class="text-xs text-slate-600">
-                            One question per line using pipe <code class="bg-white px-1.5 py-0.5 rounded border text-pink-600 font-bold">Question | Option A | Option B | Option C | Option D | Correct Letter (A/B/C/D) | Explanation</code>
+                            Mỗi dòng một câu hỏi cách nhau bởi dấu gạch đứng <code class="bg-white px-1.5 py-0.5 rounded border text-pink-600 font-bold">Câu hỏi | Lựa chọn A | B | C | D | Đáp án (A/B/C/D) | Giải thích</code>
                         </p>
                         <textarea id="bulkImportTextarea" rows="3" placeholder="What color is the sun? | Blue | Yellow | Green | Pink | B | The sun is yellow." class="w-full p-3 rounded-xl border-2 border-pink-300 text-xs font-semibold outline-none"></textarea>
                         <button onclick="handleBulkImport()" class="bg-pink-500 hover:bg-pink-600 text-white font-title font-bold px-4 py-1.5 rounded-xl text-xs transition shadow">
-                            <i class="fa-solid fa-bolt mr-1"></i> IMPORT ALL LINES
+                            <i class="fa-solid fa-bolt mr-1"></i> NHẬP TẤT CẢ VÀO MÁY
                         </button>
                     </div>
                 </details>
@@ -571,31 +529,29 @@
                 <div>
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                         <h3 class="font-title font-bold text-slate-800 text-base">
-                            Active Question Bank (<span id="modalTotalQuestions">0</span> questions)
+                            Danh sách câu hỏi đang có trong máy (<span id="modalTotalQuestions">0</span> câu = <span id="modalTotalBears">0</span> gấu)
                         </h3>
                         <div class="flex gap-2">
-                            <button onclick="restoreDefaultQuestions()" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl transition">
-                                <i class="fa-solid fa-rotate-right mr-1"></i> RESTORE DEFAULTS
+                            <button onclick="restoreDefaultQuestions()" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl transition" title="Khôi phục lại 12 câu hỏi mẫu ban đầu">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> NẠP LẠI 12 CÂU MẪU
                             </button>
-                            <button onclick="clearAllQuestions()" class="text-xs font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 px-3 py-1.5 rounded-xl transition">
-                                <i class="fa-solid fa-trash-can mr-1"></i> CLEAR ALL
+                            <button onclick="clearAllQuestions()" class="text-xs font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 px-3 py-1.5 rounded-xl transition" title="Xoá hết câu hỏi và xoá sạch gấu trong máy">
+                                <i class="fa-solid fa-trash-can mr-1"></i> XOÁ HẾT CÂU HỎI & GẤU
                             </button>
                         </div>
                     </div>
 
-                    <div id="teacherQuestionsList" class="space-y-2 max-h-[250px] overflow-y-auto pr-1">
-                        <!-- Rendered via JS -->
-                    </div>
+                    <div id="teacherQuestionsList" class="space-y-2 max-h-[250px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
             <div class="bg-slate-50 px-6 py-3 border-t flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Changes are automatically saved in this browser.
+                <span class="text-xs font-semibold text-emerald-600">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Đã tự động lưu vào trình duyệt (không bị mất khi F5 / Reload).
                 </span>
                 <button onclick="closeTeacherModal()" class="bg-pink-500 hover:bg-pink-600 text-white font-title font-bold px-6 py-2 rounded-xl text-sm shadow transition">
-                    DONE & RETURN TO GAME
+                    XONG & VÀO CHƠI TIẾP
                 </button>
             </div>
         </div>
@@ -603,13 +559,13 @@
 
     <!-- FOOTER -->
     <footer class="max-w-7xl w-full mx-auto text-center text-xs font-semibold text-slate-500 mt-3 py-1">
-        3D Hugging Teddy Bear Claw Machine 💖 • Diverse Point Tiers (0 PTS Decoys to +100 PTS) • 1P & 2-Team Classroom Mode
+        3D Teddy Claw Machine 💖 • Số lượng gấu đồng bộ chính xác với số câu hỏi • Tự động lưu LocalStorage
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- LOGIC JAVASCRIPT -->
     <script>
         /********************************************************************
-         * 1. WEB AUDIO SYNTHESIZER (NO EXTERNAL SOUND FILES REQUIRED)
+         * 1. AUDIO SYNTHESIZER
          ********************************************************************/
         let soundEnabled = true;
         let audioCtx = null;
@@ -617,13 +573,9 @@
         function getAudioContext() {
             if (!audioCtx) {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioContextClass) {
-                    audioCtx = new AudioContextClass();
-                }
+                if (AudioContextClass) audioCtx = new AudioContextClass();
             }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             return audioCtx;
         }
 
@@ -636,11 +588,9 @@
                 const gain = ctx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
-
                 gain.gain.setValueAtTime(0.001, ctx.currentTime + delay);
                 gain.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + delay + 0.02);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
-
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.start(ctx.currentTime + delay);
@@ -663,9 +613,6 @@
                 playTone(659.25, 'triangle', 0.12, 0.1, 0.18);
                 playTone(783.99, 'triangle', 0.12, 0.2, 0.18);
                 playTone(1046.50, 'sine', 0.35, 0.3, 0.22);
-            } else if (effect === 'zero') {
-                playTone(311.13, 'sawtooth', 0.16, 0, 0.12);
-                playTone(261.63, 'sawtooth', 0.26, 0.16, 0.12);
             } else if (effect === 'fail') {
                 playTone(349.23, 'sawtooth', 0.18, 0, 0.12);
                 playTone(277.18, 'sawtooth', 0.32, 0.18, 0.12);
@@ -681,12 +628,13 @@
         }
 
         /********************************************************************
-         * 2. QUESTION BANK & TEACHER PANEL STORAGE
+         * 2. QUESTIONS & LOCALSTORAGE (BẢO TOÀN DỮ LIỆU, KHÔNG MẤT KHI RELOAD)
          ********************************************************************/
-        const STORAGE_KEY_QUESTIONS = 'CLAW_ENGLISH_TEACHER_QUESTIONS_V3';
+        const STORAGE_KEY_QUESTIONS = 'CLAW_ENGLISH_TEACHER_QUESTIONS_V4_SYNC';
 
         const defaultQuestionBank = [
             {
+                id: 'q_default_1',
                 topic: "Vocabulary • Animals",
                 question: "Which animal is black and white and loves eating bamboo?",
                 options: ["A. Panda", "B. Tiger", "C. Monkey", "D. Giraffe"],
@@ -694,6 +642,7 @@
                 explanation: "Correct! Giant Pandas have black-and-white fur and love eating bamboo."
             },
             {
+                id: 'q_default_2',
                 topic: "Idioms • Feelings",
                 question: "When you win a giant teddy bear, you feel 'over the moon'. What does that mean?",
                 options: ["A. Very sleepy", "B. Extremely happy", "C. Flying in space", "D. Very angry"],
@@ -701,6 +650,7 @@
                 explanation: "'Over the moon' is an idiom that means extremely happy and delighted!"
             },
             {
+                id: 'q_default_3',
                 topic: "Grammar • Present Simple",
                 question: "Choose the correct verb form: 'She _____ hugging cute teddy bears every day.'",
                 options: ["A. love", "B. loving", "C. loves", "D. to love"],
@@ -708,13 +658,15 @@
                 explanation: "With third-person singular subject 'She' in Present Simple, we add '-s' -> loves."
             },
             {
+                id: 'q_default_4',
                 topic: "Conversation • Politeness",
                 question: "If your friend says: 'Thank you so much for this lovely teddy bear!', what should you say?",
-                options: ["A. You're welcome!", "B. Good night!", "C. See you yesterday!", "D. I amhungry."],
+                options: ["A. You're welcome!", "B. Good night!", "C. See you yesterday!", "D. I am hungry."],
                 correct: 0,
                 explanation: "'You're welcome!' is the polite response when someone thanks you."
             },
             {
+                id: 'q_default_5',
                 topic: "Vocabulary • Opposites",
                 question: "What is the opposite (antonym) of the word 'EXPENSIVE'?",
                 options: ["A. Heavy", "B. Cheap", "C. Fast", "D. Tall"],
@@ -722,6 +674,7 @@
                 explanation: "'Cheap' (inexpensive) is the opposite of 'Expensive'."
             },
             {
+                id: 'q_default_6',
                 topic: "Grammar • Prepositions",
                 question: "Fill in the blank: 'My birthday is _____ October.'",
                 options: ["A. on", "B. at", "C. in", "D. to"],
@@ -729,6 +682,7 @@
                 explanation: "We always use the preposition 'in' before months of the year (in October)."
             },
             {
+                id: 'q_default_7',
                 topic: "Grammar • Past Simple",
                 question: "What is the Past Simple (V2) form of the verb 'BUY'?",
                 options: ["A. Buyed", "B. Bought", "C. Brought", "D. Catch"],
@@ -736,6 +690,7 @@
                 explanation: "The past tense of 'buy' is 'bought' (while 'brought' is the past tense of 'bring')."
             },
             {
+                id: 'q_default_8',
                 topic: "Vocabulary • Nature",
                 question: "What colorful arc appears in the sky after it rains when the sun shines?",
                 options: ["A. Thunder", "B. Cloud", "C. Rainbow", "D. Snow"],
@@ -743,6 +698,7 @@
                 explanation: "A 'Rainbow' has seven beautiful colors and appears after rain!"
             },
             {
+                id: 'q_default_9',
                 topic: "Grammar • Comparatives",
                 question: "Choose the correct sentence: 'A rabbit is _____ than a turtle.'",
                 options: ["A. fast", "B. faster", "C. more fast", "D. fastest"],
@@ -750,6 +706,7 @@
                 explanation: "'Fast' is a short adjective, so we add '-er' to make the comparative form 'faster'."
             },
             {
+                id: 'q_default_10',
                 topic: "Idioms • Everyday English",
                 question: "What does the idiom 'A piece of cake' mean?",
                 options: ["A. Something very easy", "B. A broken cake", "C. Something very hard", "D. A birthday party"],
@@ -757,6 +714,7 @@
                 explanation: "'A piece of cake' means something is very easy to do!"
             },
             {
+                id: 'q_default_11',
                 topic: "Vocabulary • Jobs",
                 question: "Who is a doctor that takes care of sick animals and pets?",
                 options: ["A. Architect", "B. Veterinarian (Vet)", "C. Chef", "D. Pilot"],
@@ -764,6 +722,7 @@
                 explanation: "A 'Veterinarian' (or Vet) is an animal doctor!"
             },
             {
+                id: 'q_default_12',
                 topic: "Speaking • Hobbies",
                 question: "What does the question 'What do you do in your free time?' ask about?",
                 options: ["A. Your hobbies", "B. The current time", "C. The price of a toy", "D. Your home address"],
@@ -773,22 +732,26 @@
         ];
 
         let questionBank = [];
-        let usedQuestionIndices = [];
-        let decoyCountSetting = 2;
-        let disguiseDecoysAsMystery = false;
 
+        // Đọc câu hỏi từ localStorage một cách an toàn:
+        // Nếu người dùng đã từng xoá hết (lưu mảng []), ta tôn trọng mảng rỗng [] và KHÔNG tự ý tải lại 12 câu mặc định!
         function loadQuestionsFromStorage() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY_QUESTIONS);
-                if (raw) {
+                if (raw !== null) {
                     const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        questionBank = parsed;
+                    if (Array.isArray(parsed)) {
+                        questionBank = parsed.map((item, idx) => ({
+                            ...item,
+                            id: item.id || `q_${Date.now()}_${idx}`
+                        }));
                         updateQuestionBadgeCount();
                         return;
                     }
                 }
             } catch (e) {}
+
+            // Chỉ dùng câu hỏi mặc định khi đây là lần đầu tiên mở ứng dụng
             questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
             saveQuestionsToStorage();
         }
@@ -801,37 +764,18 @@
         }
 
         function updateQuestionBadgeCount() {
-            document.getElementById('questionCountBadge').textContent = questionBank.length;
+            const count = questionBank.length;
+            document.getElementById('questionCountBadge').textContent = count;
             const modalCount = document.getElementById('modalTotalQuestions');
-            if (modalCount) modalCount.textContent = questionBank.length;
-        }
-
-        function getNextQuestion() {
-            if (questionBank.length === 0) {
-                questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
-            }
-            if (usedQuestionIndices.length >= questionBank.length) {
-                usedQuestionIndices = [];
-            }
-            const available = questionBank
-                .map((q, idx) => ({ q, idx }))
-                .filter(item => !usedQuestionIndices.includes(item.idx));
-            const chosen = available[Math.floor(Math.random() * available.length)];
-            usedQuestionIndices.push(chosen.idx);
-            return chosen.q;
-        }
-
-        function updateDecoySettings() {
-            decoyCountSetting = parseInt(document.getElementById('decoyCountSelect').value, 10) || 2;
-            disguiseDecoysAsMystery = document.getElementById('disguiseDecoyCheckbox').checked;
-            if (claw.state === 'IDLE') {
-                initPlushies();
-                showMachineToast(`Updated! Spawned ${decoyCountSetting} Decoy Bear(s)! 🧸`);
-            }
+            if (modalCount) modalCount.textContent = count;
+            const modalBears = document.getElementById('modalTotalBears');
+            if (modalBears) modalBears.textContent = count;
+            const countDisplay = document.getElementById('bearCountDisplay');
+            if (countDisplay) countDisplay.textContent = count;
         }
 
         /********************************************************************
-         * 3. GAME MODES: 1 PLAYER VS 2 TEAMS (TEAM A VS TEAM B)
+         * 3. GAME MODES: 1 PLAYER VS 2 TEAMS
          ********************************************************************/
         let gameMode = '1P';
         let currentTeamTurn = 'A';
@@ -857,7 +801,7 @@
                 board2T.classList.remove('flex');
                 turnPill.classList.add('hidden');
                 document.getElementById('cabinetBannerText').textContent = "3D HUGGING TEDDY CLAW MACHINE";
-                showMachineToast("Switched to 1 Player Mode! 🎮");
+                showMachineToast("Chế độ 1 Người chơi! 🎮");
             } else {
                 btn2T.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition bg-indigo-600 text-white shadow";
                 btn1P.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition text-slate-600 hover:text-pink-600";
@@ -867,7 +811,7 @@
                 board2T.classList.add('flex');
                 turnPill.classList.remove('hidden');
                 updateTeamTurnUI();
-                showMachineToast("2 Teams Battle Mode: Team A vs Team B! 🏆");
+                showMachineToast("Chế độ Đối Kháng: Team A vs Team B! 🏆");
             }
         }
 
@@ -885,16 +829,16 @@
                 badgeA.classList.remove('hidden');
                 badgeB.classList.add('hidden');
                 turnPill.className = "absolute top-3 right-3 bg-rose-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5";
-                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> TURN: TEAM A`;
-                if (gameMode === '2TEAMS') bannerText.textContent = "CURRENT TURN: TEAM A (PINK)";
+                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> LƯỢT: TEAM A`;
+                if (gameMode === '2TEAMS') bannerText.textContent = "LƯỢT HIỆN TẠI: TEAM A (HỒNG)";
             } else {
                 cardB.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-sky-50 border-2 border-sky-400 px-3.5 py-1 rounded-2xl team-active-b";
                 cardA.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-rose-50 border-2 border-rose-200 px-3.5 py-1 rounded-2xl opacity-75";
                 badgeB.classList.remove('hidden');
                 badgeA.classList.add('hidden');
                 turnPill.className = "absolute top-3 right-3 bg-sky-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5";
-                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> TURN: TEAM B`;
-                if (gameMode === '2TEAMS') bannerText.textContent = "CURRENT TURN: TEAM B (BLUE)";
+                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> LƯỢT: TEAM B`;
+                if (gameMode === '2TEAMS') bannerText.textContent = "LƯỢT HIỆN TẠI: TEAM B (XANH)";
             }
         }
 
@@ -908,7 +852,7 @@
             if (claw.state !== 'IDLE') return;
             currentTeamTurn = team;
             updateTeamTurnUI();
-            showMachineToast(`Switched turn to Team ${team}! 👏`);
+            showMachineToast(`Đổi lượt sang Team ${team}! 👏`);
         }
 
         function resetScores() {
@@ -920,12 +864,11 @@
             document.getElementById('count1PDisplay').textContent = '0';
             document.getElementById('scoreTeamADisplay').textContent = '0 PTS';
             document.getElementById('scoreTeamBDisplay').textContent = '0 PTS';
-            showMachineToast("All scores have been reset to 0! 🔄");
+            showMachineToast("Đã đưa điểm số về 0! 🔄");
         }
 
         /********************************************************************
-         * 4. FULL-BODY SITTING HUGGING 3D TEDDY BEAR RENDERER + AURA & TIERS
-         *    (Designed to match the exact sitting open-arms teddy reference!)
+         * 4. 3D TEDDY PLUSH ENGINE & ĐỒNG BỘ 1:1 VỚI SỐ CÂU HỎI
          ********************************************************************/
         const canvas = document.getElementById('clawCanvas');
         const ctx = canvas.getContext('2d');
@@ -957,36 +900,11 @@
             moveDir: 0
         };
 
-        // Diverse Teddy Bear Catalog based on the exact sitting hugging teddy bear design
-        const TEDDY_CATALOG = [
-            // 0 PTS DECOY TEDDY BEAR
+        // Bảng giao diện skin của các chú gấu
+        const TEDDY_SKINS = [
             {
-                tier: 'DECOY',
-                tierLabel: 'Decoy Teddy',
-                points: 0,
-                isDecoy: true,
-                isMystery: false,
-                auraColor: '#94a3b8',
-                auraGlow: 'rgba(148, 163, 184, 0.48)',
-                badgeBg: '#475569',
-                furLight: '#cbd5e1',
-                furMain: '#94a3b8',
-                furDark: '#475569',
-                outlineCol: '#334155',
-                creamLight: '#f8fafc',
-                creamDark: '#e2e8f0',
-                padCol: '#334155',
-                blushCol: 'rgba(148, 163, 184, 0.5)',
-                accessory: 'dizzy',
-                name: 'Sleepy Decoy Teddy'
-            },
-            // +5 PTS CLASSIC HONEY TEDDY (Exact color palette from the reference image!)
-            {
-                tier: 'COMMON',
                 tierLabel: 'Classic Honey Teddy',
-                points: 5,
-                isDecoy: false,
-                isMystery: false,
+                points: 10,
                 auraColor: '#4ade80',
                 auraGlow: 'rgba(74, 222, 128, 0.55)',
                 badgeBg: '#16a34a',
@@ -1001,13 +919,9 @@
                 accessory: 'none',
                 name: 'Classic Honey Teddy'
             },
-            // +15 PTS STRAWBERRY PINK TEDDY
             {
-                tier: 'COMMON',
-                tierLabel: 'Sweet Teddy',
+                tierLabel: 'Sweet Strawberry Teddy',
                 points: 15,
-                isDecoy: false,
-                isMystery: false,
                 auraColor: '#34d399',
                 auraGlow: 'rgba(52, 211, 153, 0.58)',
                 badgeBg: '#059669',
@@ -1022,13 +936,9 @@
                 accessory: 'bow',
                 name: 'Strawberry Teddy'
             },
-            // +25 PTS SKY FROST TEDDY
             {
-                tier: 'RARE',
-                tierLabel: 'Rare Teddy',
+                tierLabel: 'Sky Frost Teddy',
                 points: 25,
-                isDecoy: false,
-                isMystery: false,
                 auraColor: '#38bdf8',
                 auraGlow: 'rgba(56, 189, 248, 0.65)',
                 badgeBg: '#0284c7',
@@ -1043,13 +953,9 @@
                 accessory: 'none',
                 name: 'Sky Berry Teddy'
             },
-            // +40 PTS CARAMEL PANDA TEDDY
             {
-                tier: 'RARE',
-                tierLabel: 'Super Rare Teddy',
+                tierLabel: 'Caramel Hug Teddy',
                 points: 40,
-                isDecoy: false,
-                isMystery: false,
                 auraColor: '#60a5fa',
                 auraGlow: 'rgba(96, 165, 250, 0.68)',
                 badgeBg: '#1d4ed8',
@@ -1060,17 +966,13 @@
                 creamLight: '#fffbeb',
                 creamDark: '#fde68a',
                 padCol: '#451a03',
-                blushCol: 'rgba(248, 113, 113, 0.78)',
+                blushCol: 'rgba(248, 113, 114, 0.78)',
                 accessory: 'bow',
                 name: 'Caramel Hug Teddy'
             },
-            // +60 PTS GALAXY LAVENDER TEDDY
             {
-                tier: 'EPIC',
-                tierLabel: 'Epic Teddy',
+                tierLabel: 'Galaxy Lavender Teddy',
                 points: 60,
-                isDecoy: false,
-                isMystery: false,
                 auraColor: '#c084fc',
                 auraGlow: 'rgba(192, 132, 252, 0.75)',
                 badgeBg: '#7e22ce',
@@ -1085,13 +987,9 @@
                 accessory: 'star',
                 name: 'Galaxy Lavender Teddy'
             },
-            // +100 PTS GOLDEN ROYAL TEDDY
             {
-                tier: 'LEGENDARY',
-                tierLabel: 'Legendary Teddy',
+                tierLabel: 'Royal Golden Teddy',
                 points: 100,
-                isDecoy: false,
-                isMystery: false,
                 auraColor: '#facc15',
                 auraGlow: 'rgba(250, 204, 21, 0.88)',
                 badgeBg: '#b45309',
@@ -1105,27 +1003,6 @@
                 blushCol: 'rgba(244, 63, 94, 0.78)',
                 accessory: 'crown',
                 name: 'Royal Golden Teddy'
-            },
-            // ? PTS MYSTERY SURPRISE TEDDY (Could be 0, 20, 50, or 80 PTS when answered!)
-            {
-                tier: 'MYSTERY',
-                tierLabel: 'Mystery Teddy',
-                points: 50,
-                isDecoy: false,
-                isMystery: true,
-                auraColor: '#f472b6',
-                auraGlow: 'rgba(244, 114, 182, 0.78)',
-                badgeBg: '#db2777',
-                furLight: '#fed7aa',
-                furMain: '#ea580c',
-                furDark: '#7c2d12',
-                outlineCol: '#431407',
-                creamLight: '#fff7ed',
-                creamDark: '#ffedd5',
-                padCol: '#5c2604',
-                blushCol: 'rgba(244, 114, 114, 0.76)',
-                accessory: 'crown',
-                name: 'Mystery Honey Teddy'
             }
         ];
 
@@ -1146,57 +1023,55 @@
             }
         }
 
-        function initPlushies() {
+        /**
+         * KHỞI TẠO VÀ ĐỒNG BỘ CHÍNH XÁC SỐ GẤU THEO BỘ CÂU HỎI
+         * - Nếu questionBank rỗng: plushies = [], hiển thị overlay máy trống.
+         * - Nếu questionBank có N câu hỏi: tạo đúng N chú gấu trong máy. Mỗi chú gấu giữ trực tiếp 1 câu hỏi tương ứng!
+         */
+        function repopulatePlushiesFromQuestions() {
             plushies = [];
-            const poolTemplates = [];
+            const emptyOverlay = document.getElementById('emptyMachineOverlay');
+            const totalQuestions = questionBank.length;
 
-            // Add configured number of 0-Point Decoy Teddy Bears
-            for (let d = 0; d < decoyCountSetting; d++) {
-                poolTemplates.push(TEDDY_CATALOG[0]);
+            updateQuestionBadgeCount();
+
+            if (totalQuestions === 0) {
+                // Xoá hết câu hỏi = Xoá sạch gấu!
+                emptyOverlay.classList.remove('hidden');
+                return;
+            } else {
+                emptyOverlay.classList.add('hidden');
             }
 
-            // Fill remaining slots (up to 10 bears total) with diverse point tiers (+5, +15, +25, +40, +60, +100, ? PTS)
-            const rewardTemplates = [
-                TEDDY_CATALOG[1], // +5 PTS Classic Honey Teddy
-                TEDDY_CATALOG[1], // +5 PTS Classic Honey Teddy
-                TEDDY_CATALOG[2], // +15 PTS Strawberry Teddy
-                TEDDY_CATALOG[3], // +25 PTS Sky Berry Teddy
-                TEDDY_CATALOG[4], // +40 PTS Caramel Hug Teddy
-                TEDDY_CATALOG[5], // +60 PTS Galaxy Lavender Teddy
-                TEDDY_CATALOG[6], // +100 PTS Royal Golden Teddy
-                TEDDY_CATALOG[7]  // ? PTS Mystery Honey Teddy
-            ];
+            const startX = 175;
+            const endX = 545;
+            const rowsCount = totalQuestions > 7 ? 2 : 1;
+            const itemsPerRow = Math.ceil(totalQuestions / rowsCount);
 
-            let idx = 0;
-            while (poolTemplates.length < 10) {
-                poolTemplates.push(rewardTemplates[idx % rewardTemplates.length]);
-                idx++;
-            }
+            for (let i = 0; i < totalQuestions; i++) {
+                const questionObj = questionBank[i];
+                const skin = TEDDY_SKINS[i % TEDDY_SKINS.length];
 
-            // Shuffle positions so 0-PTS Decoys mix naturally with high-point Teddies
-            poolTemplates.sort(() => Math.random() - 0.5);
-
-            const startX = 174;
-            const endX = 548;
-
-            for (let i = 0; i < poolTemplates.length; i++) {
-                const template = poolTemplates[i];
-                const row = i < 5 ? 0 : 1;
-                const colIdx = row === 0 ? i : i - 5;
-                const spacing = (endX - startX) / 4.15;
-
-                const px = startX + colIdx * spacing + (row === 1 ? 20 : -10) + (Math.random() * 12 - 6);
-                const py = row === 0 ? 390 : 340;
-
-                // Randomize Mystery Bear actual reward (can even be a 0 PTS trap or big jackpot!)
-                let actualPoints = template.points;
-                if (template.isMystery) {
-                    const mysteryOutcomes = [0, 15, 35, 50, 80, 100];
-                    actualPoints = mysteryOutcomes[Math.floor(Math.random() * mysteryOutcomes.length)];
+                let px, py;
+                if (rowsCount === 1) {
+                    const step = totalQuestions === 1 ? 0 : (endX - startX) / (totalQuestions - 1);
+                    px = totalQuestions === 1 ? (startX + endX) / 2 : startX + i * step;
+                    py = 375;
+                } else {
+                    const r = i < itemsPerRow ? 0 : 1;
+                    const c = i < itemsPerRow ? i : (i - itemsPerRow);
+                    const rowItems = r === 0 ? itemsPerRow : (totalQuestions - itemsPerRow);
+                    const step = rowItems > 1 ? (endX - startX) / (rowItems - 1) : 0;
+                    px = rowItems > 1 ? startX + c * step : (startX + endX) / 2;
+                    px += (r === 1 ? 16 : -10) + (Math.random() * 8 - 4);
+                    py = r === 0 ? 388 : 340;
                 }
 
+                // Giới hạn toạ độ trong lồng kính
+                px = Math.max(170, Math.min(548, px));
+
                 const auraOrbs = [];
-                const orbCount = actualPoints >= 60 ? 5 : (actualPoints === 0 ? 2 : 3);
+                const orbCount = skin.points >= 60 ? 5 : 3;
                 for (let k = 0; k < orbCount; k++) {
                     auraOrbs.push({
                         angle: (Math.PI * 2 * k) / orbCount,
@@ -1206,10 +1081,10 @@
                 }
 
                 plushies.push({
-                    id: Date.now() + i,
-                    ...template,
-                    points: actualPoints,
-                    x: Math.min(Math.max(px, 170), 550),
+                    id: 'bear_' + (questionObj.id || i),
+                    questionData: questionObj, // Gắn 1:1 câu hỏi vào chú gấu
+                    ...skin,
+                    x: px,
                     y: py,
                     vx: 0,
                     vy: 0,
@@ -1222,23 +1097,8 @@
             }
         }
 
-        function resetPlushPool() {
-            if (claw.state !== 'IDLE') return;
-            initPlushies();
-            showMachineToast("Respawned fresh 3D Hugging Teddy Bears! 🧸✨");
-            playSoundEffect('grab');
-        }
-
         /**
-         * EXACT 3D SITTING HUGGING TEDDY BEAR RENDERER (Matches the uploaded reference image!)
-         * Features:
-         * - Round ears with warm cream inner ear pads
-         * - Cute 3-tuft hair crest on top of the head
-         * - Happy curved crescent smiling eyes (^ ^), eyebrows, rosy cheeks
-         * - Cream oval muzzle, glossy brown oval nose, open laughing mouth with pink tongue
-         * - Plump pear-shaped sitting body with a cream oval belly patch
-         * - Outstretched hugging arms with thumb, dark brown palm pad & 4 tiny toe beans
-         * - Two sitting feet facing forward with dark brown oval sole pads
+         * VẼ 3D TEDDY BEAR NGỒI DANG TAY ÔM CHÂN THỰC
          */
         function drawSittingHuggingTeddy3D(targetCtx, bear, x, y, scale = 1, showBadge = true) {
             targetCtx.save();
@@ -1251,7 +1111,7 @@
                 ? Math.sin(animTick * 0.35) * 0.24
                 : Math.sin(animTick * 0.08 + bear.phase) * 0.07;
 
-            // 1. MAGICAL 3D AURA GLOW BEHIND THE TEDDY BEAR
+            // 1. AURA HÀO QUANG
             const auraPulse = 1 + Math.sin(animTick * 0.09 + bear.phase) * 0.11;
             const auraRadius = 42 * auraPulse;
 
@@ -1265,44 +1125,41 @@
             targetCtx.arc(0, breathe - 2, auraRadius, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // Rotating magic ring
+            // Vòng hào quang xoay
             targetCtx.save();
             targetCtx.translate(0, breathe - 2);
             targetCtx.rotate(animTick * 0.025 + bear.phase);
             targetCtx.strokeStyle = bear.auraColor;
             targetCtx.lineWidth = bear.points >= 60 ? 2.4 : 1.6;
-            targetCtx.setLineDash(bear.points === 0 ? [3, 6] : [7, 5]);
+            targetCtx.setLineDash([7, 5]);
             targetCtx.beginPath();
             targetCtx.arc(0, 0, 34, 0, Math.PI * 2);
             targetCtx.stroke();
             targetCtx.setLineDash([]);
             targetCtx.restore();
 
-            // Orbiting Aura Sparkles
             if (bear.auraOrbs) {
                 for (let orb of bear.auraOrbs) {
                     orb.angle += orb.speed;
                     const ox = Math.cos(orb.angle) * orb.dist;
                     const oy = (breathe - 2) + Math.sin(orb.angle) * (orb.dist * 0.78);
-                    targetCtx.fillStyle = bear.points === 0 ? '#94a3b8' : '#ffffff';
+                    targetCtx.fillStyle = '#ffffff';
                     targetCtx.beginPath();
                     targetCtx.arc(ox, oy, bear.points >= 60 ? 2.8 : 2.1, 0, Math.PI * 2);
                     targetCtx.fill();
                 }
             }
 
-            // 2. SOFT GROUND SHADOW
+            // 2. BÓNG ĐỔ TRÊN SÀN
             targetCtx.fillStyle = "rgba(15, 23, 42, 0.35)";
             targetCtx.beginPath();
             targetCtx.ellipse(0, 27, 25, 6.5, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // Apply Teddy breathing & gentle tilt
             targetCtx.save();
             targetCtx.translate(0, breathe);
             targetCtx.rotate(bear.rotation || 0);
 
-            // Helper for 3D shaded rounded shapes with warm fur outline
             function makeFurGrad(cx, cy, r) {
                 const g = targetCtx.createRadialGradient(cx - r * 0.28, cy - r * 0.32, r * 0.08, cx, cy, r * 1.15);
                 g.addColorStop(0, bear.furLight);
@@ -1323,129 +1180,95 @@
             targetCtx.lineJoin = "round";
             targetCtx.lineCap = "round";
 
-            // =========================================================================
-            // A. OUTSTRETCHED HUGGING ARMS (Left & Right with thumb, palm pad & 4 toe beans)
-            // =========================================================================
+            // A. TAY DANG ÔM
             [-1, 1].forEach(dir => {
                 targetCtx.save();
                 targetCtx.scale(dir, 1);
                 targetCtx.translate(13, 3);
                 targetCtx.rotate(-0.32 + (dir === 1 ? armWave : -armWave));
 
-                // Main outstretched arm & rounded paw
                 targetCtx.fillStyle = makeFurGrad(10, 0, 14);
                 targetCtx.beginPath();
                 targetCtx.moveTo(-2, -5.5);
                 targetCtx.quadraticCurveTo(6, -6.5, 10, -8.5);
-                // Little upward thumb bump on top edge of paw (just like the picture!)
                 targetCtx.quadraticCurveTo(12.2, -12.5, 14.8, -9.2);
                 targetCtx.quadraticCurveTo(16.2, -7.5, 18.5, -6.8);
-                // Rounded outer paw tip
                 targetCtx.bezierCurveTo(25.5, -5.5, 25.5, 6.5, 17.5, 6.8);
                 targetCtx.quadraticCurveTo(8, 7.2, -2, 5.2);
                 targetCtx.closePath();
                 targetCtx.fill();
                 targetCtx.stroke();
 
-                // Dark brown oval central palm pad
+                // Đệm lòng bàn tay
                 targetCtx.fillStyle = bear.padCol;
                 targetCtx.beginPath();
                 targetCtx.ellipse(15.2, 0.4, 3.6, 4.2, 0.12, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // 4 tiny round toe beans curving around the outer edge of the paw
-                const beanCoords = [
-                    [19.2, -3.6],
-                    [21.0, -1.2],
-                    [20.8, 1.5],
-                    [18.9, 3.8]
-                ];
+                // 4 đốm ngón tay xinh xắn
+                const beanCoords = [[19.2, -3.6], [21.0, -1.2], [20.8, 1.5], [18.9, 3.8]];
                 for (const [bx, by] of beanCoords) {
                     targetCtx.beginPath();
                     targetCtx.arc(bx, by, 1.15, 0, Math.PI * 2);
                     targetCtx.fill();
                 }
-
                 targetCtx.restore();
             });
 
-            // =========================================================================
-            // B. PLUMP PEAR-SHAPED SITTING TORSO & CREAM BELLY PATCH
-            // =========================================================================
+            // B. THÂN TRÒN TRĨNH & BỤNG SỮA
             targetCtx.fillStyle = makeFurGrad(0, 11, 18);
             targetCtx.beginPath();
             targetCtx.ellipse(0, 12.5, 15.2, 13.8, 0, 0, Math.PI * 2);
             targetCtx.fill();
             targetCtx.stroke();
 
-            // Soft Cream Oval Belly Patch
             targetCtx.fillStyle = makeCreamGrad(0, 12.5, 11);
             targetCtx.beginPath();
             targetCtx.ellipse(0, 13, 9.6, 9.0, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // =========================================================================
-            // C. TWO SITTING LEGS & FORWARD-FACING OVAL FEET SOLES WITH DARK PADS
-            // =========================================================================
+            // C. 2 CHÂN NGỒI
             [-1, 1].forEach(dir => {
                 targetCtx.save();
                 targetCtx.scale(dir, 1);
-
-                // Outer foot sole oval angled outward
                 targetCtx.fillStyle = makeFurGrad(12, 20, 11);
                 targetCtx.beginPath();
                 targetCtx.ellipse(12.5, 20.5, 8.2, 10.2, -0.42, 0, Math.PI * 2);
                 targetCtx.fill();
                 targetCtx.stroke();
 
-                // Rim highlight on top of foot
-                targetCtx.fillStyle = "rgba(255,255,255,0.28)";
-                targetCtx.beginPath();
-                targetCtx.ellipse(10.5, 13.5, 3.2, 1.3, -0.3, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                // Dark brown inner foot pad oval
                 targetCtx.fillStyle = bear.padCol;
                 targetCtx.beginPath();
                 targetCtx.ellipse(12.8, 21.3, 5.0, 6.6, -0.42, 0, Math.PI * 2);
                 targetCtx.fill();
-
                 targetCtx.restore();
             });
 
-            // =========================================================================
-            // D. ROUND EARS ON TOP CORNERS WITH WARM CREAM INNER PADS
-            // =========================================================================
+            // D. TAI TRÒN
             [-1, 1].forEach(dir => {
                 targetCtx.save();
                 targetCtx.scale(dir, 1);
-
-                // Outer ear
                 targetCtx.fillStyle = makeFurGrad(15.5, -18.5, 9.5);
                 targetCtx.beginPath();
                 targetCtx.arc(15.5, -18.5, 8.6, 0, Math.PI * 2);
                 targetCtx.fill();
                 targetCtx.stroke();
 
-                // Cream inner ear cushion
                 targetCtx.fillStyle = makeCreamGrad(15.2, -18.2, 5.5);
                 targetCtx.beginPath();
                 targetCtx.arc(15.2, -18.2, 4.9, 0, Math.PI * 2);
                 targetCtx.fill();
-
                 targetCtx.restore();
             });
 
-            // =========================================================================
-            // E. LARGE ROUNDED TEDDY HEAD & 3-TUFT HAIR CREST ON TOP
-            // =========================================================================
+            // E. ĐẦU VÀ CHỎM LÔNG
             targetCtx.fillStyle = makeFurGrad(0, -8.5, 21);
             targetCtx.beginPath();
             targetCtx.ellipse(0, -8.5, 19.2, 16.4, 0, 0, Math.PI * 2);
             targetCtx.fill();
             targetCtx.stroke();
 
-            // Cute 3-tuft fur crest on top center of head (exact detail from reference image!)
+            // Chỏm lông 3 nhánh trên đầu
             targetCtx.fillStyle = bear.furLight;
             targetCtx.beginPath();
             targetCtx.moveTo(-3.5, -24.0);
@@ -1456,16 +1279,7 @@
             targetCtx.fill();
             targetCtx.stroke();
 
-            // Soft 3D forehead shine highlight
-            targetCtx.fillStyle = "rgba(255, 255, 255, 0.30)";
-            targetCtx.beginPath();
-            targetCtx.ellipse(-6.5, -18.2, 6.5, 2.6, -0.3, 0, Math.PI * 2);
-            targetCtx.fill();
-
-            // =========================================================================
-            // F. FACIAL FEATURES: EYEBROWS, HAPPY CRESCENT EYES (^ ^), BLUSH, MUZZLE & OPEN SMILE
-            // =========================================================================
-            // Cute curved eyebrows
+            // F. MẮT CƯỜI, MÁ HỒNG, MÕM VÀ MIỆNG CƯỜI HÍ HỬNG
             targetCtx.strokeStyle = bear.padCol;
             targetCtx.lineWidth = 1.7;
             targetCtx.beginPath();
@@ -1475,7 +1289,7 @@
             targetCtx.arc(7.5, -15.5, 3.2, Math.PI * 1.22, Math.PI * 1.82);
             targetCtx.stroke();
 
-            // Happy upward-curved crescent smiling eyes (^ ^) just like the reference image!
+            // Mắt cười híp tít
             targetCtx.strokeStyle = "#3e1603";
             targetCtx.lineWidth = 2.5;
             targetCtx.lineCap = "round";
@@ -1486,40 +1300,26 @@
             targetCtx.arc(8.2, -9.2, 4.1, Math.PI * 1.12, Math.PI * 1.88);
             targetCtx.stroke();
 
-            // Rosy Pink Oval Cheek Blushes
+            // Má hồng
             targetCtx.fillStyle = bear.blushCol;
             targetCtx.beginPath();
             targetCtx.ellipse(-12.2, -4.8, 3.9, 2.2, 0, 0, Math.PI * 2);
             targetCtx.ellipse(12.2, -4.8, 3.9, 2.2, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // Large Cream Oval Muzzle Patch
+            // Mõm trắng kem
             targetCtx.fillStyle = makeCreamGrad(0, -3.5, 8.5);
             targetCtx.beginPath();
             targetCtx.ellipse(0, -3.2, 7.6, 6.4, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // Glossy Dark Brown Oval Nose with White Highlight
+            // Mũi nâu
             targetCtx.fillStyle = "#4a1c04";
             targetCtx.beginPath();
             targetCtx.ellipse(0, -6.2, 3.4, 2.3, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            targetCtx.fillStyle = "rgba(255, 255, 255, 0.75)";
-            targetCtx.beginPath();
-            targetCtx.ellipse(-1.1, -6.9, 1.1, 0.6, -0.2, 0, Math.PI * 2);
-            targetCtx.fill();
-
-            // Cheerful Open Laughing Mouth with Cute Pink Tongue Inside!
-            // Upper smile lip curve
-            targetCtx.strokeStyle = "#4a1c04";
-            targetCtx.lineWidth = 1.5;
-            targetCtx.beginPath();
-            targetCtx.moveTo(-3.8, -3.6);
-            targetCtx.quadraticCurveTo(0, -2.0, 3.8, -3.6);
-            targetCtx.stroke();
-
-            // Open mouth cavity
+            // Miệng cười
             targetCtx.fillStyle = "#7f1d1d";
             targetCtx.beginPath();
             targetCtx.moveTo(-3.1, -3.3);
@@ -1530,15 +1330,13 @@
             targetCtx.fill();
             targetCtx.stroke();
 
-            // Pink/Coral Tongue inside open mouth
+            // Lưỡi hồng
             targetCtx.fillStyle = "#fb7185";
             targetCtx.beginPath();
             targetCtx.ellipse(0, 0.2, 2.1, 1.45, 0, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // =========================================================================
-            // G. OPTIONAL ROYAL CROWN / BOW / STAR FOR HIGHER POINT TIERS
-            // =========================================================================
+            // Phụ kiện vương miện/nơ
             if (bear.accessory === 'crown') {
                 targetCtx.fillStyle = "#facc15";
                 targetCtx.strokeStyle = "#b45309";
@@ -1569,30 +1367,15 @@
                 targetCtx.closePath();
                 targetCtx.fill();
                 targetCtx.stroke();
-                targetCtx.beginPath();
-                targetCtx.arc(0, 3.2, 2.0, 0, Math.PI * 2);
-                targetCtx.fill();
-            } else if (bear.accessory === 'star') {
-                targetCtx.fillStyle = "#fde047";
-                targetCtx.beginPath();
-                targetCtx.arc(0, -29, 4, 0, Math.PI * 2);
-                targetCtx.fill();
             }
 
             targetCtx.restore();
 
-            // =========================================================================
-            // H. POINT TIER BADGE BELOW TEDDY BEAR (0 PTS, +5 PTS, +15 PTS, ... ? PTS)
-            // =========================================================================
+            // G. HUY HIỆU ĐIỂM
             if (showBadge) {
                 targetCtx.save();
                 targetCtx.translate(0, 30);
-
-                const hideZeroAsMystery = bear.isDecoy && disguiseDecoysAsMystery;
-                const displayMystery = bear.isMystery || hideZeroAsMystery;
-                const labelText = displayMystery ? "? PTS" : `${bear.points === 0 ? '0' : '+' + bear.points} PTS`;
-
-                targetCtx.fillStyle = displayMystery ? '#db2777' : bear.badgeBg;
+                targetCtx.fillStyle = bear.badgeBg;
                 targetCtx.strokeStyle = "#ffffff";
                 targetCtx.lineWidth = 2;
                 targetCtx.beginPath();
@@ -1604,14 +1387,13 @@
                 targetCtx.font = "800 10.5px 'Baloo 2', sans-serif";
                 targetCtx.textAlign = "center";
                 targetCtx.textBaseline = "middle";
-                targetCtx.fillText(labelText, 0, 0.5);
+                targetCtx.fillText(`+${bear.points} PTS`, 0, 0.5);
                 targetCtx.restore();
             }
 
             targetCtx.restore();
         }
 
-        // Toast Helper
         let toastTimeout = null;
         function showMachineToast(msg) {
             const toast = document.getElementById('machineToast');
@@ -1642,10 +1424,14 @@
 
         function triggerClawDrop() {
             if (claw.state !== 'IDLE') return;
+            if (plushies.length === 0) {
+                showMachineToast("Máy hết gấu rồi! Hãy thêm câu hỏi ở Bảng Câu Hỏi nhé! 🧸");
+                return;
+            }
             claw.state = 'DROPPING';
             claw.prongAngle = 0.52;
             playSoundEffect('drop');
-            showMachineToast("Dropping the claw... 🎯");
+            showMachineToast("Đang thả càng gắp... 🎯");
         }
 
         function updateGamePhysics() {
@@ -1694,10 +1480,9 @@
                     claw.prongAngle = 0.14;
                     claw.state = 'RISING';
                     if (claw.grabbedPlush) {
-                        const badgeInfo = claw.grabbedPlush.isMystery ? '? PTS' : `${claw.grabbedPlush.points} PTS`;
-                        showMachineToast(`Grabbed ${claw.grabbedPlush.name} (${badgeInfo})! 🌟`);
+                        showMachineToast(`Đã tóm được ${claw.grabbedPlush.name}! 🌟`);
                     } else {
-                        showMachineToast("Missed! Try aiming right over a teddy bear! 💪");
+                        showMachineToast("Gắp trượt rồi! Hãy canh càng chuẩn hơn nhé! 💪");
                     }
                 }
             } else if (claw.state === 'RISING') {
@@ -1716,9 +1501,7 @@
                     } else {
                         claw.prongAngle = 0.46;
                         claw.state = 'IDLE';
-                        if (gameMode === '2TEAMS') {
-                            switchTeamTurn();
-                        }
+                        if (gameMode === '2TEAMS') switchTeamTurn();
                     }
                 }
             } else if (claw.state === 'MOVING_TO_CHUTE') {
@@ -1748,22 +1531,18 @@
                     claw.grabbedPlush = null;
                 }
                 claw.state = 'IDLE';
-                if (gameMode === '2TEAMS') {
-                    switchTeamTurn();
-                }
+                if (gameMode === '2TEAMS') switchTeamTurn();
             } else if (claw.state === 'RETURNING') {
                 if (claw.x < 270) {
                     claw.x += claw.speedX;
                 } else {
                     claw.prongAngle = 0.46;
                     claw.state = 'IDLE';
-                    if (gameMode === '2TEAMS') {
-                        switchTeamTurn();
-                    }
+                    if (gameMode === '2TEAMS') switchTeamTurn();
                 }
             }
 
-            // Update falling physics for teddy bears
+            // Vật lý rơi cho gấu
             for (let i = plushies.length - 1; i >= 0; i--) {
                 const p = plushies[i];
                 if (p.state === 'FALLING_CHUTE') {
@@ -1775,9 +1554,9 @@
                         spawnConfetti(CHUTE.x + CHUTE.width / 2, CHUTE.y + 18);
                         collectPrize(p);
                         plushies.splice(i, 1);
-
+                        updateQuestionBadgeCount();
                         if (plushies.length === 0) {
-                            setTimeout(initPlushies, 1200);
+                            document.getElementById('emptyMachineOverlay').classList.remove('hidden');
                         }
                     }
                 } else if (p.state === 'FALLING_FLOOR') {
@@ -1805,7 +1584,6 @@
         function drawClawMachine() {
             ctx.clearRect(0, 0, GAME_W, GAME_H);
 
-            // 1. Twinkling Starry Background
             for (let st of bgStars) {
                 const alpha = 0.35 + Math.sin(animTick * 0.05 + st.phase) * 0.3;
                 ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
@@ -1814,37 +1592,31 @@
                 ctx.fill();
             }
 
-            // 2. Top Metallic Rail
             ctx.fillStyle = "#e2e8f0";
             ctx.fillRect(0, 12, GAME_W, 14);
             ctx.fillStyle = "#94a3b8";
             ctx.fillRect(0, 22, GAME_W, 4);
 
-            // 3. Plush Machine Floor
             const floorGrad = ctx.createLinearGradient(0, 412, 0, GAME_H);
             floorGrad.addColorStop(0, "#f472b6");
             floorGrad.addColorStop(1, "#9d174d");
             ctx.fillStyle = floorGrad;
             ctx.fillRect(0, 415, GAME_W, 35);
 
-            // 4. Draw All Sitting Hugging 3D Teddy Bears
             for (let p of plushies) {
                 if (p.state !== 'GRABBED') {
                     drawSittingHuggingTeddy3D(ctx, p, p.x, p.y, 1, true);
                 }
             }
 
-            // 5. Draw Claw & Grabbed Teddy Bear
             drawClawMechanism();
 
             if (claw.grabbedPlush) {
                 drawSittingHuggingTeddy3D(ctx, claw.grabbedPlush, claw.grabbedPlush.x, claw.grabbedPlush.y, 1.05, true);
             }
 
-            // 6. Draw Prize Chute
             drawPrizeChute();
 
-            // 7. Confetti Particles
             for (let pt of particles) {
                 ctx.save();
                 ctx.globalAlpha = Math.max(0, pt.alpha);
@@ -1859,7 +1631,6 @@
         function drawClawMechanism() {
             ctx.save();
 
-            // Aiming Laser Guide when IDLE
             if (claw.state === 'IDLE') {
                 ctx.strokeStyle = "rgba(250, 204, 21, 0.45)";
                 ctx.lineWidth = 2;
@@ -1871,7 +1642,6 @@
                 ctx.setLineDash([]);
             }
 
-            // Top Motor Carriage
             ctx.fillStyle = "#f43f5e";
             ctx.strokeStyle = "#ffffff";
             ctx.lineWidth = 2.5;
@@ -1880,7 +1650,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Steel Cable
             ctx.strokeStyle = "#cbd5e1";
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -1890,7 +1659,7 @@
 
             ctx.translate(claw.x, claw.y);
 
-            // Left Prong
+            // Càng trái
             ctx.save();
             ctx.rotate(claw.prongAngle);
             ctx.strokeStyle = "#e2e8f0";
@@ -1904,7 +1673,7 @@
             ctx.stroke();
             ctx.restore();
 
-            // Right Prong
+            // Càng phải
             ctx.save();
             ctx.rotate(-claw.prongAngle);
             ctx.strokeStyle = "#e2e8f0";
@@ -1918,7 +1687,6 @@
             ctx.stroke();
             ctx.restore();
 
-            // Golden Hub Joint
             ctx.fillStyle = "#facc15";
             ctx.strokeStyle = "#b45309";
             ctx.lineWidth = 3;
@@ -1932,7 +1700,6 @@
 
         function drawPrizeChute() {
             ctx.save();
-
             const grad = ctx.createLinearGradient(CHUTE.x, CHUTE.y, CHUTE.x, CHUTE.y + CHUTE.height);
             grad.addColorStop(0, "#ec4899");
             grad.addColorStop(1, "#9d174d");
@@ -1953,36 +1720,32 @@
             ctx.fillStyle = "#fef08a";
             ctx.font = "800 14px 'Baloo 2', sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText("🎁 PRIZE CHUTE", CHUTE.x + CHUTE.width / 2, CHUTE.y + 74);
+            ctx.fillText("🎁 MÁNG TRẢ THƯỞNG", CHUTE.x + CHUTE.width / 2, CHUTE.y + 74);
 
             ctx.fillStyle = "#fce7f3";
             ctx.font = "700 11px 'Quicksand', sans-serif";
             ctx.fillText("DROP ZONE", CHUTE.x + CHUTE.width / 2, CHUTE.y + 94);
-
             ctx.restore();
         }
 
         /********************************************************************
-         * 5. QUIZ MODAL & DIVERSE POINT REWARD LOGIC
+         * 5. TRẢ LỜI CÂU HỎI TIẾNG ANH GẮN TRỰC TIẾP VỚI CHÚ GẤU
          ********************************************************************/
-        let currentQuiz = null;
+        let currentGrabbedBear = null;
 
         function openQuizModal(plush) {
-            currentQuiz = getNextQuestion();
+            currentGrabbedBear = plush;
+            // Lấy chính xác câu hỏi được gán cho chú gấu này
+            const quiz = plush.questionData;
 
-            // Render exact 3D Sitting Hugging Teddy preview in the Quiz Modal
             const pCanvas = document.getElementById('quizBearPreviewCanvas');
             const pCtx = pCanvas.getContext('2d');
             pCtx.clearRect(0, 0, 80, 80);
             drawSittingHuggingTeddy3D(pCtx, plush, 40, 42, 0.92, false);
 
-            const hideZeroAsMystery = plush.isDecoy && disguiseDecoysAsMystery;
-            const isMysteryDisplay = plush.isMystery || hideZeroAsMystery;
-            const ptsLabel = isMysteryDisplay ? '? PTS' : `${plush.points === 0 ? '0' : '+' + plush.points} PTS`;
-
             const rarityBadge = document.getElementById('quizRarityBadge');
-            rarityBadge.textContent = `✨ ${plush.tierLabel} (${ptsLabel})`;
-            rarityBadge.style.backgroundColor = isMysteryDisplay ? '#db2777' : plush.badgeBg;
+            rarityBadge.textContent = `✨ ${plush.tierLabel} (+${plush.points} PTS)`;
+            rarityBadge.style.backgroundColor = plush.badgeBg;
             rarityBadge.style.color = '#ffffff';
 
             const teamBadge = document.getElementById('quizTurnTeamBadge');
@@ -1996,10 +1759,10 @@
                 teamBadge.classList.add('hidden');
             }
 
-            document.getElementById('quizPlushName').textContent = `${plush.name} is on the claw!`;
-            document.getElementById('quizTopicBadge').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ${currentQuiz.topic || 'English Challenge'}`;
-            document.getElementById('quizPointsText').textContent = `🎁 Reward: ${ptsLabel}`;
-            document.getElementById('quizQuestionText').textContent = currentQuiz.question;
+            document.getElementById('quizPlushName').textContent = `${plush.name} đang trên càng!`;
+            document.getElementById('quizTopicBadge').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ${quiz.topic || 'English Quiz'}`;
+            document.getElementById('quizPointsText').textContent = `🎁 Thưởng: +${plush.points} PTS`;
+            document.getElementById('quizQuestionText').textContent = quiz.question;
 
             const feedbackBox = document.getElementById('quizFeedbackBox');
             feedbackBox.classList.add('hidden');
@@ -2007,11 +1770,11 @@
             const optionsContainer = document.getElementById('quizOptionsContainer');
             optionsContainer.innerHTML = '';
 
-            currentQuiz.options.forEach((optText, index) => {
+            quiz.options.forEach((optText, index) => {
                 const btn = document.createElement('button');
                 btn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-indigo-200 bg-white hover:bg-indigo-50 hover:border-indigo-400 text-slate-700 transition flex items-center justify-between shadow-sm text-sm sm:text-base";
                 btn.innerHTML = `<span>${optText}</span> <i class="fa-regular fa-circle text-indigo-300"></i>`;
-                btn.onclick = () => submitQuizAnswer(index, btn);
+                btn.onclick = () => submitQuizAnswer(index, btn, quiz);
                 optionsContainer.appendChild(btn);
             });
 
@@ -2020,52 +1783,47 @@
             modal.classList.add('flex');
         }
 
-        function submitQuizAnswer(selectedIndex, clickedBtn) {
+        function submitQuizAnswer(selectedIndex, clickedBtn, quiz) {
             const buttons = document.getElementById('quizOptionsContainer').querySelectorAll('button');
             buttons.forEach(b => b.disabled = true);
 
             const feedbackBox = document.getElementById('quizFeedbackBox');
             feedbackBox.classList.remove('hidden');
 
-            const isCorrect = selectedIndex === Number(currentQuiz.correct);
-            const grabbed = claw.grabbedPlush;
+            const isCorrect = selectedIndex === Number(quiz.correct);
+            const grabbed = currentGrabbedBear;
 
             if (isCorrect) {
-                playSoundEffect(grabbed && grabbed.points === 0 ? 'zero' : 'win');
+                playSoundEffect('win');
                 clickedBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 text-emerald-900 flex items-center justify-between shadow-sm text-sm sm:text-base";
                 clickedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-600 text-lg";
 
-                const pts = grabbed ? grabbed.points : 10;
-                const extraNote = pts === 0
-                    ? `<br><span class="text-slate-600 font-bold">😅 Oh no! This was a 0-PTS Decoy Teddy Bear! Still, awesome English answer!</span>`
-                    : `<br><span class="text-amber-700 font-bold">🎁 Delivering ${grabbed.name} (+${pts} PTS) to the Prize Chute!</span>`;
-
                 feedbackBox.className = "rounded-2xl p-3.5 text-sm font-semibold mb-1 bg-emerald-50 border-2 border-emerald-300 text-emerald-800";
-                feedbackBox.innerHTML = `<b class="block text-emerald-700 mb-0.5 font-title text-base">🎉 Correct Answer!</b> ${currentQuiz.explanation || ''}${extraNote}`;
+                feedbackBox.innerHTML = `<b class="block text-emerald-700 mb-0.5 font-title text-base">🎉 Chính xác tuyệt đối!</b> ${quiz.explanation || ''}<br><span class="text-amber-700 font-bold">🎁 Đang đưa chú gấu (+${grabbed.points} PTS) vào máng nhận thưởng!</span>`;
 
                 setTimeout(() => {
                     closeQuizModal();
-                    showMachineToast("Correct! Carrying Teddy Bear to the Prize Chute! 🎁");
+                    showMachineToast("Đúng rồi! Đang đưa gấu về máng! 🎁");
                     claw.state = 'MOVING_TO_CHUTE';
-                }, 1550);
+                }, 1400);
             } else {
                 playSoundEffect('fail');
                 clickedBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-rose-500 bg-rose-100 text-rose-900 flex items-center justify-between shadow-sm text-sm sm:text-base";
                 clickedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-600 text-lg";
 
-                const rightBtn = buttons[currentQuiz.correct];
+                const rightBtn = buttons[quiz.correct];
                 if (rightBtn) {
                     rightBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 flex items-center justify-between text-sm sm:text-base";
                 }
 
                 feedbackBox.className = "rounded-2xl p-3.5 text-sm font-semibold mb-1 bg-rose-50 border-2 border-rose-300 text-rose-800";
-                feedbackBox.innerHTML = `<b class="block text-rose-700 mb-0.5 font-title text-base">💡 Oops! The teddy bear slipped!</b> ${currentQuiz.explanation || 'Remember the correct answer for next time!'}`;
+                feedbackBox.innerHTML = `<b class="block text-rose-700 mb-0.5 font-title text-base">💡 Rất tiếc, câu trả lời chưa đúng!</b> ${quiz.explanation || 'Hãy ghi nhớ đáp án cho lượt sau nhé!'}`;
 
                 setTimeout(() => {
                     closeQuizModal();
-                    showMachineToast("Oops! The teddy bear slipped back into the machine! 💪");
+                    showMachineToast("Gấu tuột khỏi càng rồi, hãy cố gắng lượt sau! 💪");
                     claw.state = 'DROPPING_FAIL';
-                }, 2100);
+                }, 1900);
             }
         }
 
@@ -2076,32 +1834,28 @@
         }
 
         function collectPrize(plush) {
-            const pts = plush.points ?? 0;
-            playSoundEffect(pts === 0 ? 'zero' : 'win');
+            const pts = plush.points ?? 10;
+            playSoundEffect('win');
 
             if (gameMode === '1P') {
                 score1P += pts;
                 count1P += 1;
                 document.getElementById('score1PDisplay').textContent = score1P;
                 document.getElementById('count1PDisplay').textContent = count1P;
-                if (pts === 0) {
-                    showMachineToast(`Caught ${plush.name}... It's a 0 PTS Decoy! 😅`);
-                } else {
-                    showMachineToast(`Collected ${plush.name} (+${pts} PTS)! 💖`);
-                }
+                showMachineToast(`Chúc mừng! Bạn đã gắp được ${plush.name} (+${pts} PTS)! 💖`);
             } else {
                 if (currentTeamTurn === 'A') {
                     scoreTeamA += pts;
                     document.getElementById('scoreTeamADisplay').textContent = `${scoreTeamA} PTS`;
-                    showMachineToast(pts === 0 ? `Team A caught a 0 PTS Decoy Teddy! 😅` : `Team A earned +${pts} PTS from ${plush.name}! 🎉`);
+                    showMachineToast(`Team A nhận được +${pts} PTS từ ${plush.name}! 🎉`);
                 } else {
                     scoreTeamB += pts;
                     document.getElementById('scoreTeamBDisplay').textContent = `${scoreTeamB} PTS`;
-                    showMachineToast(pts === 0 ? `Team B caught a 0 PTS Decoy Teddy! 😅` : `Team B earned +${pts} PTS from ${plush.name}! 🎉`);
+                    showMachineToast(`Team B nhận được +${pts} PTS từ ${plush.name}! 🎉`);
                 }
             }
 
-            // Add miniature 3D Sitting Teddy Bear Canvas to Collection Shelf
+            // Thêm gấu đã gắp vào bộ sưu tập bên phải
             const grid = document.getElementById('collectionGrid');
             const emptyText = document.getElementById('emptyCollectionText');
             if (emptyText) emptyText.remove();
@@ -2125,7 +1879,7 @@
             metaDiv.className = "flex items-center gap-1.5";
             metaDiv.innerHTML = `
                 <span class="text-xs font-title font-bold text-slate-700">${plush.name}</span>
-                <span class="text-[11px] font-extrabold ${pts === 0 ? 'text-slate-500' : 'text-amber-600'}">${pts === 0 ? '0 PTS' : '+' + pts + ' PTS'}</span>
+                <span class="text-[11px] font-extrabold text-amber-600">+${pts} PTS</span>
                 ${teamTag}
             `;
 
@@ -2135,7 +1889,7 @@
         }
 
         /********************************************************************
-         * 6. TEACHER PANEL QUESTION MANAGER
+         * 6. TEACHER PANEL: THÊM / SỬA / XOÁ / ĐỒNG BỘ LOCALSTORAGE
          ********************************************************************/
         function openTeacherModal() {
             renderTeacherQuestionList();
@@ -2149,6 +1903,8 @@
             const modal = document.getElementById('teacherModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            // Cập nhật lại số gấu ngay khi đóng bảng
+            repopulatePlushiesFromQuestions();
         }
 
         function showTeacherNotice(text, isError = false) {
@@ -2168,7 +1924,7 @@
 
         function saveSingleQuestion() {
             const qText = document.getElementById('inpQuestion').value.trim();
-            const topic = document.getElementById('inpTopic').value.trim() || "Teacher Custom";
+            const topic = document.getElementById('inpTopic').value.trim() || "English";
             const optA = document.getElementById('inpOptA').value.trim();
             const optB = document.getElementById('inpOptB').value.trim();
             const optC = document.getElementById('inpOptC').value.trim();
@@ -2178,11 +1934,12 @@
             const editIdx = parseInt(document.getElementById('editQuestionIndex').value, 10);
 
             if (!qText || !optA || !optB || !optC || !optD) {
-                showTeacherNotice("⚠️ Please fill in the Question Prompt and all 4 options (A, B, C, D)!", true);
+                showTeacherNotice("⚠️ Vui lòng nhập nội dung câu hỏi và đủ 4 lựa chọn A, B, C, D!", true);
                 return;
             }
 
             const newQuestionObj = {
+                id: editIdx >= 0 && questionBank[editIdx] ? questionBank[editIdx].id : 'q_' + Date.now(),
                 topic,
                 question: qText,
                 options: [
@@ -2192,18 +1949,19 @@
                     formatOptionLabel(3, optD)
                 ],
                 correct: correctIdx,
-                explanation: explanation || `The correct answer is Option ${['A', 'B', 'C', 'D'][correctIdx]}.`
+                explanation: explanation || `Đáp án đúng là ${['A', 'B', 'C', 'D'][correctIdx]}.`
             };
 
             if (editIdx >= 0 && editIdx < questionBank.length) {
                 questionBank[editIdx] = newQuestionObj;
-                showTeacherNotice("✅ Question updated successfully!");
+                showTeacherNotice("✅ Đã cập nhật câu hỏi!");
             } else {
-                questionBank.unshift(newQuestionObj);
-                showTeacherNotice("✅ Added new question to the bank!");
+                questionBank.push(newQuestionObj);
+                showTeacherNotice("✅ Đã thêm câu hỏi mới và bổ sung 1 chú gấu vào máy!");
             }
 
             saveQuestionsToStorage();
+            repopulatePlushiesFromQuestions();
             resetQuestionForm();
             renderTeacherQuestionList();
         }
@@ -2221,15 +1979,17 @@
             document.getElementById('inpCorrect').value = q.correct;
             document.getElementById('inpExplanation').value = q.explanation || '';
 
-            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Editing Question #${idx + 1}`;
-            document.getElementById('saveQuestionBtnText').textContent = "UPDATE QUESTION";
+            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Đang chỉnh sửa câu hỏi #${idx + 1}`;
+            document.getElementById('saveQuestionBtnText').textContent = "CẬP NHẬT CÂU HỎI";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
         }
 
         function deleteQuestion(idx) {
             questionBank.splice(idx, 1);
             saveQuestionsToStorage();
+            repopulatePlushiesFromQuestions();
             renderTeacherQuestionList();
+            showTeacherNotice("🗑️ Đã xoá câu hỏi & giảm 1 chú gấu trong máy!");
         }
 
         function resetQuestionForm() {
@@ -2242,8 +2002,8 @@
             document.getElementById('inpOptD').value = '';
             document.getElementById('inpCorrect').value = '0';
             document.getElementById('inpExplanation').value = '';
-            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-circle-plus text-indigo-600"></i> Add New Question`;
-            document.getElementById('saveQuestionBtnText').textContent = "SAVE QUESTION";
+            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-circle-plus text-indigo-600"></i> Thêm Câu Hỏi Mới (+1 Chú Gấu vào tủ)`;
+            document.getElementById('saveQuestionBtnText').textContent = "LƯU CÂU HỎI";
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
@@ -2260,8 +2020,9 @@
                     const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
                     const correctIdx = letterMap[ansLetter.toUpperCase()] ?? 0;
 
-                    questionBank.unshift({
-                        topic: "Teacher Imported",
+                    questionBank.push({
+                        id: 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        topic: "Imported",
                         question: qText,
                         options: [
                             formatOptionLabel(0, a),
@@ -2270,7 +2031,7 @@
                             formatOptionLabel(3, d)
                         ],
                         correct: correctIdx,
-                        explanation: exp || `The correct answer is ${ansLetter.toUpperCase()}.`
+                        explanation: exp || `Đáp án đúng là ${ansLetter.toUpperCase()}.`
                     });
                     added++;
                 }
@@ -2279,27 +2040,29 @@
             if (added > 0) {
                 document.getElementById('bulkImportTextarea').value = '';
                 saveQuestionsToStorage();
+                repopulatePlushiesFromQuestions();
                 renderTeacherQuestionList();
-                showTeacherNotice(`🎉 Successfully imported ${added} new question(s)!`);
+                showTeacherNotice(`🎉 Đã nhập thành công ${added} câu hỏi và thêm tương ứng ${added} chú gấu!`);
             } else {
-                showTeacherNotice("⚠️ Invalid format. Please separate columns with the pipe symbol |", true);
+                showTeacherNotice("⚠️ Định dạng không đúng. Hãy dùng dấu gạch đứng | để phân cách các phần!", true);
             }
         }
 
         function restoreDefaultQuestions() {
             questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
-            usedQuestionIndices = [];
             saveQuestionsToStorage();
+            repopulatePlushiesFromQuestions();
             renderTeacherQuestionList();
-            showTeacherNotice("🔄 Restored the 12 default English questions!");
+            showTeacherNotice("🔄 Đã khôi phục 12 câu hỏi tiếng Anh mẫu & 12 chú gấu!");
         }
 
+        // XOÁ SẠCH CÂU HỎI = XOÁ SẠCH GẤU (VÀ LƯU VÀO TRÌNH DUYỆT)
         function clearAllQuestions() {
             questionBank = [];
-            usedQuestionIndices = [];
             saveQuestionsToStorage();
+            repopulatePlushiesFromQuestions();
             renderTeacherQuestionList();
-            showTeacherNotice("🗑️ Cleared all questions. Add your custom questions above!");
+            showTeacherNotice("🗑️ Đã xoá toàn bộ câu hỏi và xoá sạch gấu trong tủ!");
         }
 
         function renderTeacherQuestionList() {
@@ -2308,7 +2071,13 @@
             container.innerHTML = '';
 
             if (questionBank.length === 0) {
-                container.innerHTML = `<p class="text-xs font-semibold text-slate-400 text-center py-4">Question bank is empty. Add questions using the form above!</p>`;
+                container.innerHTML = `
+                    <div class="bg-rose-50 border-2 border-dashed border-rose-300 rounded-2xl p-6 text-center">
+                        <i class="fa-solid fa-teddy-bear text-rose-400 text-3xl mb-2 block"></i>
+                        <p class="text-sm font-bold text-rose-700">Hiện tại danh sách câu hỏi đang TRỐNG!</p>
+                        <p class="text-xs text-rose-500 mt-1">Vì vậy trong máy cũng không còn chú gấu nào. Hãy thêm câu hỏi ở biểu mẫu phía trên nhé!</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -2319,19 +2088,19 @@
                 row.innerHTML = `
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-xs font-extrabold bg-indigo-100 text-indigo-700 px-2 py-0.2 rounded-md">#${idx + 1}</span>
+                            <span class="text-xs font-extrabold bg-indigo-100 text-indigo-700 px-2 py-0.2 rounded-md">#${idx + 1} 🧸 Gấu #${idx + 1}</span>
                             <span class="text-[11px] font-bold text-slate-400 uppercase">${q.topic || 'English'}</span>
                         </div>
                         <p class="text-sm font-title font-bold text-slate-800">${q.question}</p>
                         <p class="text-xs font-semibold text-emerald-700 mt-0.5">
-                            <i class="fa-solid fa-check mr-1"></i> Answer: <b>${correctLabel}</b>
+                            <i class="fa-solid fa-check mr-1"></i> Đáp án: <b>${correctLabel}</b>
                         </p>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <button onclick="editQuestion(${idx})" class="w-8 h-8 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center text-xs transition" title="Edit Question">
+                        <button onclick="editQuestion(${idx})" class="w-8 h-8 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center text-xs transition" title="Sửa câu hỏi">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button onclick="deleteQuestion(${idx})" class="w-8 h-8 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center text-xs transition" title="Delete Question">
+                        <button onclick="deleteQuestion(${idx})" class="w-8 h-8 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center text-xs transition" title="Xoá câu hỏi này">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -2341,7 +2110,7 @@
         }
 
         /********************************************************************
-         * 7. AI WEBCAM HAND TRACKING (ANTI-MIRROR FLIPPED)
+         * 7. AI WEBCAM HAND TRACKING
          ********************************************************************/
         const videoElement = document.getElementById('webcamVideo');
         const webcamCanvas = document.getElementById('webcamCanvas');
@@ -2366,13 +2135,7 @@
                                       (thumbIP.y < thumbMCP.y - 0.01) &&
                                       (thumbTip.y < indexMCP.y - 0.04);
 
-            const fingerPairs = [
-                [8, 6],
-                [12, 10],
-                [16, 14],
-                [20, 18]
-            ];
-
+            const fingerPairs = [[8, 6], [12, 10], [16, 14], [20, 18]];
             let curledCount = 0;
             for (const [tipIdx, pipIdx] of fingerPairs) {
                 const tip = landmarks[tipIdx];
@@ -2394,8 +2157,6 @@
 
             webcamCtx.save();
             webcamCtx.clearRect(0, 0, W, H);
-
-            // Horizontally flip webcam feed (scale(-1, 1)) so real-world left/right matches screen left/right!
             webcamCtx.translate(W, 0);
             webcamCtx.scale(-1, 1);
             webcamCtx.drawImage(results.image, 0, 0, W, H);
@@ -2424,7 +2185,6 @@
 
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const rawLandmarks = results.multiHandLandmarks[0];
-
                 const flippedLandmarks = rawLandmarks.map(pt => ({
                     x: 1 - pt.x,
                     y: pt.y,
@@ -2450,7 +2210,7 @@
                 if (isThumbUp) {
                     aiHandDirection = 0;
                     statusBadge.className = "text-xs sm:text-sm font-bold text-emerald-400 flex items-center gap-1.5";
-                    statusBadge.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> Thumbs Up - DROP CLAW!`;
+                    statusBadge.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> Ngón Cái - THẢ CÀNG!`;
 
                     const now = Date.now();
                     if (claw.state === 'IDLE' && now - lastThumbDropTime > 1800) {
@@ -2461,21 +2221,21 @@
                     if (palmCenter.x < 0.38) {
                         aiHandDirection = -1;
                         statusBadge.className = "text-xs sm:text-sm font-bold text-sky-300 flex items-center gap-1.5";
-                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Moving Left`;
+                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Sang Trái`;
                     } else if (palmCenter.x > 0.62) {
                         aiHandDirection = 1;
                         statusBadge.className = "text-xs sm:text-sm font-bold text-sky-300 flex items-center gap-1.5";
-                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Moving Right`;
+                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Sang Phải`;
                     } else {
                         aiHandDirection = 0;
                         statusBadge.className = "text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5";
-                        statusBadge.innerHTML = `<i class="fa-solid fa-hand"></i> Center (Show 👍 to Drop)`;
+                        statusBadge.innerHTML = `<i class="fa-solid fa-hand"></i> Trung Tâm (Giơ 👍 để gắp)`;
                     }
                 }
             } else {
                 aiHandDirection = 0;
                 statusBadge.className = "text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5";
-                statusBadge.innerHTML = `<i class="fa-regular fa-eye"></i> Show your hand to Camera`;
+                statusBadge.innerHTML = `<i class="fa-regular fa-eye"></i> Hãy đưa bàn tay trước Camera`;
             }
         }
 
@@ -2511,8 +2271,8 @@
 
             try {
                 startBtn.disabled = true;
-                startBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Starting AI Camera...`;
-                statusBadge.innerHTML = `Loading MediaPipe Hands...`;
+                startBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Đang khởi động AI...`;
+                statusBadge.innerHTML = `Đang tải MediaPipe Hands...`;
 
                 if (!handsDetector) {
                     handsDetector = new Hands({
@@ -2545,27 +2305,25 @@
                 isCameraRunning = true;
 
                 document.getElementById('camOverlay').classList.add('hidden');
-                document.getElementById('camBtnText').textContent = "STOP WEBCAM";
-                showMachineToast("AI Hand Tracking Activated! 🖐️✨");
+                document.getElementById('camBtnText').textContent = "TẮT WEBCAM";
+                showMachineToast("Nhận diện cử chỉ tay AI đã sẵn sàng! 🖐️✨");
             } catch (error) {
                 startBtn.disabled = false;
-                startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> RETRY WEBCAM`;
-                statusBadge.innerHTML = `Webcam unavailable (Use buttons/keys)`;
-                showMachineToast("Camera not found — use the on-screen buttons or arrow keys!");
+                startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> THỬ LẠI WEBCAM`;
+                statusBadge.innerHTML = `Không có camera (Dùng phím bấm)`;
+                showMachineToast("Không tìm thấy Webcam — Bạn có thể dùng bàn phím hoặc nút trên màn hình!");
             }
         }
 
         function stopCamera() {
             isCameraRunning = false;
             aiHandDirection = 0;
-            if (cameraInstance) {
-                cameraInstance.stop();
-            }
+            if (cameraInstance) cameraInstance.stop();
             document.getElementById('camOverlay').classList.remove('hidden');
-            document.getElementById('camBtnText').textContent = "START WEBCAM";
+            document.getElementById('camBtnText').textContent = "BẬT WEBCAM";
             const startBtn = document.getElementById('startCamMainBtn');
             startBtn.disabled = false;
-            startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> ENABLE AI WEBCAM`;
+            startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> KÍCH HOẠT CAMERA AI`;
             document.getElementById('gestureStatusBadge').innerHTML = `<i class="fa-solid fa-circle-info"></i> Camera Off`;
         }
 
@@ -2575,7 +2333,7 @@
         }
 
         /********************************************************************
-         * 8. KEYBOARD, MOUSE & TOUCH CONTROLS
+         * 8. PHÍM BẤM & VÒNG LẶP CHƠI GAME
          ********************************************************************/
         function setupControls() {
             const btnLeft = document.getElementById('btnLeft');
@@ -2628,7 +2386,7 @@
         window.onload = function () {
             loadQuestionsFromStorage();
             initBgStars();
-            initPlushies();
+            repopulatePlushiesFromQuestions();
             setupControls();
             gameLoop();
         };
