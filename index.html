@@ -1,1033 +1,2637 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siêu Máy Gắp Thú 5D - Thumbs Up Vision Engine</title>
+    <title>3D Teddy Claw Machine - AI English Quiz</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Baloo 2 & Quicksand -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MediaPipe Hands & Utilities -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
     <style>
+        :root {
+            --font-heading: 'Baloo 2', cursive, sans-serif;
+            --font-body: 'Quicksand', sans-serif;
+        }
+
         body {
-            font-family: 'Nunito', sans-serif;
-            background: radial-gradient(circle at 50% 10%, #fff0f6 0%, #f3d9fa 45%, #c5f6fa 100%);
+            font-family: var(--font-body);
+            background-color: #fdf2f8;
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(244, 114, 182, 0.22) 0px, transparent 50%),
+                radial-gradient(at 85% 20%, rgba(96, 165, 250, 0.22) 0px, transparent 50%),
+                radial-gradient(at 50% 85%, rgba(250, 204, 21, 0.18) 0px, transparent 50%),
+                radial-gradient(#f9a8d4 1.2px, transparent 1.2px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
             user-select: none;
             overflow-x: hidden;
         }
-        .font-title {
-            font-family: 'Baloo 2', cursive;
-        }
-        .cabinet-glass {
-            background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.06) 38%, rgba(255,255,255,0.22) 100%);
-            box-shadow: inset 0 0 40px rgba(244, 114, 182, 0.3), inset 0 12px 24px rgba(255,255,255,0.75);
-        }
-        @keyframes plush-breathe {
-            0%, 100% { transform: translate(-50%, 0) scale(1, 1); }
-            50% { transform: translate(-50%, -5px) scale(1.05, 0.95); }
-        }
-        .plush-3d {
-            animation: plush-breathe 2.4s infinite ease-in-out;
-            filter: drop-shadow(0 9px 7px rgba(80, 20, 60, 0.3));
-            transition: bottom 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes struggle-swing {
-            0%, 100% { transform: rotate(-10deg) scale(1.04, 0.96); }
-            50% { transform: rotate(10deg) scale(0.96, 1.04); }
-        }
-        .plush-struggle {
-            animation: struggle-swing 0.3s infinite ease-in-out !important;
-        }
-        @keyframes drop-into-chute {
-            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-            70% { transform: translateY(230px) scale(0.85) rotate(25deg); opacity: 1; }
-            100% { transform: translateY(290px) scale(0.5) rotate(45deg); opacity: 0; }
-        }
-        .animate-chute-drop {
-            animation: drop-into-chute 0.65s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
-        }
-        .claw-finger-left, .claw-finger-right {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .claw-open .claw-finger-left { transform: rotate(28deg); }
-        .claw-open .claw-finger-right { transform: rotate(-28deg); }
-        .claw-grab .claw-finger-left { transform: rotate(-18deg); }
-        .claw-grab .claw-finger-right { transform: rotate(18deg); }
 
-        .btn-arcade-pink {
-            box-shadow: 0 7px 0 #be185d, 0 10px 18px rgba(190, 24, 93, 0.35);
-            transition: all 0.08s;
+        h1, h2, h3, h4, .font-title {
+            font-family: var(--font-heading);
+            letter-spacing: 0.01em;
         }
-        .btn-arcade-pink:active:not(:disabled) {
-            transform: translateY(5px);
-            box-shadow: 0 2px 0 #be185d;
+
+        /* 3D Arcade Cabinet Styling */
+        .arcade-cabinet {
+            box-shadow: 
+                0 22px 50px rgba(219, 39, 119, 0.32),
+                inset 0 4px 12px rgba(255, 255, 255, 0.85),
+                0 0 0 8px #f472b6,
+                0 0 0 13px #be185d;
         }
-        .btn-arcade-blue {
-            box-shadow: 0 6px 0 #0369a1, 0 8px 14px rgba(3, 105, 161, 0.3);
-            transition: all 0.08s;
+
+        .glass-reflection {
+            background: linear-gradient(125deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.07) 38%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
         }
-        .btn-arcade-blue:active:not(:disabled) {
+
+        /* 3D Tactile Buttons */
+        .btn-3d-pink {
+            transition: all 0.12s ease;
+            box-shadow: 0 5px 0 #9d174d, 0 8px 15px rgba(0,0,0,0.18);
+        }
+        .btn-3d-pink:active:not(:disabled) {
             transform: translateY(4px);
-            box-shadow: 0 2px 0 #0369a1;
+            box-shadow: 0 1px 0 #9d174d, 0 3px 6px rgba(0,0,0,0.18);
+        }
+
+        .btn-3d-blue {
+            transition: all 0.12s ease;
+            box-shadow: 0 6px 0 #1e40af, 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .btn-3d-blue:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e40af, 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-3d-yellow {
+            transition: all 0.12s ease;
+            box-shadow: 0 6px 0 #b45309, 0 8px 16px rgba(0,0,0,0.22);
+        }
+        .btn-3d-yellow:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #b45309, 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Active Team Turn Glow */
+        .team-active-a {
+            box-shadow: 0 0 0 4px #f43f5e, 0 10px 25px rgba(244, 63, 94, 0.35);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .team-active-b {
+            box-shadow: 0 0 0 4px #3b82f6, 0 10px 25px rgba(59, 130, 246, 0.35);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-7px) rotate(2deg); }
+        }
+        .floating-avatar {
+            animation: floatSlow 2.6s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fce7f3;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #db2777;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between py-3 px-2 md:px-4">
+<body class="min-h-screen flex flex-col justify-between p-2 sm:p-4 text-slate-800">
 
-    <!-- HEADER -->
-    <header class="w-full max-w-6xl flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md px-5 py-3 rounded-[28px] shadow-xl border-4 border-pink-300">
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-md border-2 border-white animate-pulse">
-                <span class="text-2xl">👍</span>
-            </div>
-            <div>
-                <h1 class="font-title text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 leading-none">
-                    MÁY GẮP THÚ AI - VISION ENGINE MỚI
-                </h1>
-                <p class="text-xs md:text-sm text-purple-600 font-extrabold mt-0.5">
-                    Lướt tay Trái/Phải để di chuyển • Giơ ngón cái lên 👍 để kích hoạt gắp ngay!
-                </p>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2.5">
-            <button onclick="openQuestionManager()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-2xl shadow-md transition flex items-center gap-2 text-sm">
-                <span>📝</span> Soạn Câu Hỏi (<span id="qCountBadge">0</span>)
-            </button>
-            <button onclick="shufflePlushies('manual')" class="bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold px-3.5 py-2 rounded-2xl shadow-md transition text-sm flex items-center gap-1.5">
-                <span>🌪️</span> Xốc Đảo Thú
-            </button>
-        </div>
-    </header>
-
-    <!-- GIAO DIỆN CHÍNH -->
-    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-3 items-start">
-
-        <!-- CỘT TRÁI: MÁY GẮP THÚ (7 CỘT) -->
-        <div id="fullMachineWrapper" class="lg:col-span-7 flex flex-col items-center w-full">
-
-            <div class="w-full max-w-xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 rounded-t-[44px] p-3.5 border-4 border-b-0 border-pink-600 shadow-lg flex justify-between items-center px-6 relative overflow-hidden">
-                <div class="flex gap-2">
-                    <span class="w-3.5 h-3.5 rounded-full bg-yellow-300 animate-ping"></span>
-                    <span class="w-3.5 h-3.5 rounded-full bg-cyan-300 animate-bounce"></span>
+    <!-- HEADER: Title, Game Mode Switcher, 1P/2-Team Scoreboards & Teacher Panel -->
+    <header class="max-w-7xl w-full mx-auto bg-white/95 backdrop-blur-md px-4 py-3 rounded-[2rem] shadow-lg border-4 border-pink-400 mb-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Game Logo & Tier Legend -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-400 to-pink-500 flex items-center justify-center text-white text-2xl shadow-md border-2 border-white">
+                    <i class="fa-solid fa-paw"></i>
                 </div>
-                <div class="bg-white/95 px-5 py-1 rounded-full shadow-inner border-2 border-pink-200 flex items-center gap-2">
-                    <span class="font-title text-pink-600 font-extrabold tracking-wider text-sm md:text-base">✨ THUMBS UP ARENA ✨</span>
-                </div>
-                <div class="flex gap-2">
-                    <span class="w-3.5 h-3.5 rounded-full bg-cyan-300 animate-bounce"></span>
-                    <span class="w-3.5 h-3.5 rounded-full bg-yellow-300 animate-ping"></span>
-                </div>
-            </div>
-
-            <!-- LỒNG KÍNH -->
-            <div id="machineCabinet" class="w-full max-w-xl h-[400px] bg-gradient-to-b from-sky-100 via-pink-50 to-purple-100 border-x-8 border-pink-500 relative overflow-hidden select-none">
-                <div class="absolute inset-0 opacity-35 pointer-events-none" style="background-image: radial-gradient(#f472b6 2px, transparent 2px); background-size: 24px 24px;"></div>
-                <div id="fxLayer" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
-
-                <div class="w-full h-4 bg-gradient-to-b from-slate-300 to-slate-400 border-b-2 border-slate-500 relative z-20 flex items-center px-4">
-                    <div class="w-full h-1 bg-slate-600/40 rounded-full"></div>
-                </div>
-
-                <div class="absolute top-6 left-3 right-3 z-30 flex justify-between items-center pointer-events-none">
-                    <div class="bg-white/90 backdrop-blur px-3 py-1 rounded-full border-2 border-purple-300 shadow-sm flex items-center gap-1.5">
-                        <span class="text-xs">🌪️</span>
-                        <span id="shuffleCountText" class="text-[11px] font-black text-purple-700">Tự xốc đảo sau: 2 lượt</span>
-                    </div>
-                </div>
-
-                <!-- CÀNG GẮP -->
-                <div id="clawAssembly" class="absolute top-2 z-20 flex flex-col items-center pointer-events-none" style="left: 250px; transform: translateX(-50%);">
-                    <div class="w-14 h-6 bg-gradient-to-b from-pink-400 to-pink-600 rounded-b-xl border-2 border-pink-700 shadow-md flex items-center justify-center">
-                        <div class="w-6 h-2 bg-yellow-300 rounded-full"></div>
-                    </div>
-                    <div id="clawCable" class="w-1.5 bg-gradient-to-r from-slate-500 via-slate-300 to-slate-600 shadow-sm" style="height: 28px;"></div>
-                    
-                    <div id="clawHead" class="relative flex flex-col items-center -mt-1">
-                        <div class="w-11 h-8 bg-gradient-to-b from-amber-300 to-amber-500 rounded-2xl border-2 border-amber-700 shadow-md z-20 flex items-center justify-center">
-                            <div class="w-4 h-4 rounded-full bg-white/80 shadow-inner"></div>
-                        </div>
-
-                        <div class="flex justify-between w-24 -mt-2 relative z-10">
-                            <svg class="claw-finger-left w-12 h-16 origin-top-right" viewBox="0 0 50 70">
-                                <path d="M45 5 C15 10, 8 35, 18 58 C22 65, 32 66, 36 60" fill="none" stroke="#475569" stroke-width="6" stroke-linecap="round"/>
-                                <circle cx="34" cy="60" r="4.5" fill="#ec4899" stroke="#9d174d" stroke-width="2"/>
-                            </svg>
-                            <svg class="claw-finger-right w-12 h-16 origin-top-left" viewBox="0 0 50 70">
-                                <path d="M5 5 C35 10, 42 35, 32 58 C28 65, 18 66, 14 60" fill="none" stroke="#475569" stroke-width="6" stroke-linecap="round"/>
-                                <circle cx="16" cy="60" r="4.5" fill="#ec4899" stroke="#9d174d" stroke-width="2"/>
-                            </svg>
-                        </div>
-
-                        <div id="laserSight" class="w-0.5 h-60 bg-gradient-to-b from-rose-500/70 via-pink-400/40 to-transparent -mt-3 pointer-events-none"></div>
-                        <div id="clawHeldSlot" class="absolute top-7 w-24 h-24 flex items-center justify-center z-15"></div>
-                    </div>
-                </div>
-
-                <!-- HỐ THẢ QUÀ -->
-                <div class="absolute bottom-0 left-0 w-[118px] h-[145px] z-25 pointer-events-none flex flex-col justify-end">
-                    <div class="w-full h-7 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 rounded-tr-2xl border-t-4 border-r-4 border-white shadow-lg flex items-center justify-center">
-                        <span class="text-[11px] font-black text-white tracking-wider uppercase">⬇ HỐ THẢ THÚ</span>
-                    </div>
-                    <div class="w-full flex-1 bg-gradient-to-b from-slate-900/50 via-pink-950/60 to-slate-950/80 border-r-4 border-pink-400 backdrop-blur-[2px] relative overflow-hidden flex flex-col items-center justify-center">
-                        <div class="w-16 h-full border-x-2 border-dashed border-pink-300/40 flex items-center justify-center">
-                            <span class="text-pink-200/60 font-title font-bold text-xs rotate-[-90deg] whitespace-nowrap">DROP CHUTE</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="plushPit" class="absolute inset-0 z-10 pointer-events-none"></div>
-                <div class="absolute inset-0 cabinet-glass pointer-events-none z-30"></div>
-            </div>
-
-            <!-- ĐIỀU KHIỂN & HỘC QUÀ -->
-            <div class="w-full max-w-xl bg-gradient-to-b from-pink-500 via-rose-500 to-pink-600 rounded-b-[42px] p-4 border-4 border-t-4 border-pink-700 shadow-2xl grid grid-cols-12 gap-3 items-center relative">
-                
-                <div class="col-span-5 sm:col-span-4 flex flex-col items-center">
-                    <div class="w-full bg-slate-900/90 rounded-2xl border-4 border-pink-300 shadow-inner h-26 relative flex flex-col items-center justify-center overflow-visible p-2">
-                        <div class="absolute top-0 inset-x-2 h-4 bg-white/15 rounded-b-lg border-b border-white/25 flex items-center justify-center">
-                            <span class="text-[10px] font-extrabold text-pink-200 uppercase tracking-widest">Cửa Lấy Quà</span>
-                        </div>
-                        <div id="prizeTraySlot" class="mt-2 flex flex-col items-center justify-center">
-                            <span class="text-[11px] text-slate-400 font-bold text-center px-1">Thả thú xuống đây</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-7 sm:col-span-8 flex flex-col items-center justify-between gap-2 bg-pink-700/40 p-3 rounded-3xl border-2 border-pink-300/40">
-                    <div class="w-full flex items-center justify-around gap-2">
-                        <div class="flex items-center gap-2">
-                            <button id="btnLeft"
-                                onmousedown="startMove(-1)" onmouseup="stopMove()" onmouseleave="stopMove()"
-                                ontouchstart="startMove(-1); event.preventDefault();" ontouchend="stopMove()"
-                                class="btn-arcade-blue bg-sky-400 hover:bg-sky-300 text-white font-title font-extrabold text-2xl w-12 h-12 rounded-2xl border-2 border-white flex items-center justify-center">
-                                ◀
-                            </button>
-                            <button id="btnRight"
-                                onmousedown="startMove(1)" onmouseup="stopMove()" onmouseleave="stopMove()"
-                                ontouchstart="startMove(1); event.preventDefault();" ontouchend="stopMove()"
-                                class="btn-arcade-blue bg-sky-400 hover:bg-sky-300 text-white font-title font-extrabold text-2xl w-12 h-12 rounded-2xl border-2 border-white flex items-center justify-center">
-                                ▶
-                            </button>
-                        </div>
-
-                        <button onclick="shufflePlushies('manual')"
-                            class="bg-purple-500 hover:bg-purple-400 text-white font-title font-extrabold text-xs px-3 py-3 rounded-2xl border-2 border-white flex items-center gap-1 shadow">
-                            <span>🌪️</span> <span>XỐC THÚ</span>
-                        </button>
-
-                        <button id="btnGrab" onclick="startClawSequence()"
-                            class="btn-arcade-pink bg-gradient-to-b from-amber-300 to-amber-500 text-rose-900 font-title font-extrabold text-base px-4 py-3 rounded-full border-4 border-white tracking-wide flex items-center gap-1 shadow-xl">
-                            <span>🪝</span> <span>GẮP NGAY!</span>
-                        </button>
-                    </div>
-
-                    <div class="text-[11px] text-pink-100 font-bold text-center">
-                        🖐️ Lướt tay Trái/Phải ngắm gấu • Giơ ngón cái 👍 để gắp!
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CỘT PHẢI: WEBCAM AI & 2 RỔ ĐỘI (5 CỘT) -->
-        <div class="lg:col-span-5 flex flex-col gap-4 w-full">
-
-            <div class="bg-white/95 backdrop-blur-md p-3.5 rounded-[28px] border-4 border-purple-300 shadow-xl">
-                <!-- Chọn đội -->
-                <div class="flex items-center justify-between gap-2 mb-3 bg-purple-50 p-2 rounded-2xl border border-purple-200">
-                    <span class="text-xs font-black text-purple-700 ml-1">Lượt gắp:</span>
-                    <div class="flex gap-2">
-                        <button onclick="setActiveTeam('red')" id="teamRedBtn" class="px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-500 bg-red-500 text-white shadow">
-                            🔴 Đội Đỏ (<span id="scoreRed">0</span>đ)
-                        </button>
-                        <button onclick="setActiveTeam('blue')" id="teamBlueBtn" class="px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-200 bg-white text-blue-600">
-                            🔵 Đội Xanh (<span id="scoreBlue">0</span>đ)
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between mb-2 px-1">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-lg">🤖</span>
-                        <h3 class="font-title text-sm font-extrabold text-purple-700">Webcam Vision Tracking</h3>
-                    </div>
-                    <span id="aiEngineBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-emerald-300">
-                        🟢 Đang chạy trực tiếp
-                    </span>
-                </div>
-
-                <!-- Khung Video & Thanh đo Thumbs Up -->
-                <div id="webcamContainer" class="relative w-full h-48 bg-slate-900 rounded-2xl overflow-hidden border-2 border-purple-300 flex items-center justify-center">
-                    <video id="webcam" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100" autoplay playsinline muted></video>
-                    <canvas id="output_canvas" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100 pointer-events-none"></canvas>
-
-                    <!-- HUD Thanh đo mức độ giơ ngón cái -->
-                    <div class="absolute top-2 left-2 bg-black/75 backdrop-blur px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/20 z-20">
-                        <span class="text-[11px] text-white font-bold">Mức giơ ngón cái:</span>
-                        <div class="w-20 h-2.5 bg-gray-700 rounded-full overflow-hidden border border-gray-500">
-                            <div id="thumbBar" class="h-full bg-emerald-400 transition-all duration-75" style="width: 0%;"></div>
-                        </div>
-                        <span id="thumbVal" class="text-[11px] font-black text-amber-300">0%</span>
-                    </div>
-
-                    <!-- Hiệu ứng báo hiệu ĐÃ NHẬN THUMBS UP -->
-                    <div id="thumbLockAlert" class="absolute inset-0 bg-emerald-500/35 border-4 border-emerald-400 rounded-2xl hidden items-center justify-center z-30 pointer-events-none">
-                        <div class="bg-emerald-600 text-white font-title text-xl font-black px-5 py-2 rounded-full shadow-2xl animate-bounce flex items-center gap-2">
-                            <span>👍</span> THUMBS UP: GẮP NGAY!
-                        </div>
-                    </div>
-
-                    <!-- Thanh trạng thái phía dưới -->
-                    <div class="absolute bottom-2 left-2 right-2 bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-xl flex justify-between items-center text-white text-xs font-extrabold z-20 border border-white/10">
-                        <span id="gestureText" class="text-cyan-300 flex items-center gap-1">
-                            <span>🔍</span> Đang quét bàn tay...
-                        </span>
-                        <span id="handCoordText" class="text-pink-300 bg-white/10 px-2 py-0.5 rounded-md">Vị trí: Giữa</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2 RỔ ĐỰNG THÚ -->
-            <div class="bg-white/95 backdrop-blur-md p-4 rounded-[32px] border-4 border-pink-300 shadow-xl flex flex-col gap-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="font-title text-lg text-pink-600 font-extrabold flex items-center gap-1.5">
-                        <span>🧺</span> Kho Thú Của 2 Đội
-                    </h2>
-                    <span class="text-[11px] text-gray-500 font-bold">*Nhặt thú vào rổ đội đang gắp</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- RỔ ĐỎ -->
-                    <div class="bg-red-50/80 p-3 rounded-2xl border-2 border-red-300 flex flex-col justify-between">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-title font-extrabold text-red-600 text-sm">🔴 Đội Đỏ (<span id="countRed">0</span>)</span>
-                            <button onclick="assignPrizeToTeam('red')" id="btnClaimRed" class="hidden bg-red-500 hover:bg-red-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow animate-bounce">
-                                Nhận về Đội Đỏ
-                            </button>
-                        </div>
-                        <div id="basketRedGrid" class="grid grid-cols-3 gap-1.5 min-h-[90px] bg-white/70 p-2 rounded-xl border border-red-200 content-start">
-                            <span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>
-                        </div>
-                    </div>
-
-                    <!-- RỔ XANH -->
-                    <div class="bg-blue-50/80 p-3 rounded-2xl border-2 border-blue-300 flex flex-col justify-between">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-title font-extrabold text-blue-600 text-sm">🔵 Đội Xanh (<span id="countBlue">0</span>)</span>
-                            <button onclick="assignPrizeToTeam('blue')" id="btnClaimBlue" class="hidden bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow animate-bounce">
-                                Nhận về Đội Xanh
-                            </button>
-                        </div>
-                        <div id="basketBlueGrid" class="grid grid-cols-3 gap-1.5 min-h-[90px] bg-white/70 p-2 rounded-xl border border-blue-200 content-start">
-                            <span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- MODAL 1: CÂU HỎI NGỮ PHÁP -->
-    <div id="quizModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-xl rounded-[36px] border-8 border-pink-300 shadow-2xl overflow-hidden">
-            <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 p-4 text-white flex items-center gap-4">
-                <div id="quizPlushPreview" class="w-16 h-16 bg-white/25 rounded-2xl flex items-center justify-center shrink-0 p-1 shadow-inner"></div>
                 <div>
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-xs uppercase tracking-wider bg-yellow-300 text-rose-900 px-3 py-0.5 rounded-full font-black">
-                            🎯 Thử thách giữ thú!
-                        </span>
-                        <span id="quizGiftBadge" class="text-xs bg-white/25 text-white px-2.5 py-0.5 rounded-full font-extrabold"></span>
+                    <h1 class="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-amber-700 via-pink-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+                        3D Teddy Claw Machine • English Quiz
+                    </h1>
+                    <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-slate-500">
+                        <span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">💀 0 PTS Decoy</span>
+                        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">🟢 +5~15 PTS</span>
+                        <span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">🔵 +25~40 PTS</span>
+                        <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">🟣 +60 PTS</span>
+                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">👑 +100 PTS</span>
+                        <span class="bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">🌈 ? PTS Mystery</span>
                     </div>
-                    <h3 id="quizTitle" class="font-title text-xl md:text-2xl font-extrabold mt-1">
-                        Trả lời đúng để thả thú rơi xuống hộp!
-                    </h3>
                 </div>
             </div>
 
-            <div class="p-6">
-                <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 mb-5 shadow-inner">
-                    <span class="text-xs font-black text-purple-500 uppercase tracking-wider">Câu hỏi ngữ pháp Tiếng Anh:</span>
-                    <p id="quizQuestionText" class="text-lg md:text-xl font-black text-gray-800 mt-1 leading-relaxed">
-                        She _______ to school every day.
-                    </p>
-                </div>
-
-                <div id="quizOptionsBox" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-                <div id="quizFeedbackBox" class="mt-4 hidden p-3.5 rounded-2xl text-center font-extrabold text-sm"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: BẢNG SOẠN CÂU HỎI -->
-    <div id="managerModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-[34px] border-8 border-purple-300 shadow-2xl flex flex-col overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-600 to-pink-500 px-6 py-4 text-white flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-2xl">📚</span>
-                    <h2 class="font-title text-xl md:text-2xl font-bold">Trình Soạn Câu Hỏi Ngữ Pháp Trực Tiếp</h2>
-                </div>
-                <button onclick="closeQuestionManager()" class="bg-white/20 hover:bg-white/30 text-white font-extrabold px-4 py-1.5 rounded-xl">
-                    ✕ Đóng
-                </button>
-            </div>
-
-            <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-6 flex-1">
-                <div class="md:col-span-5 bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
-                    <h3 class="font-title text-purple-700 font-bold text-lg mb-3">➕ Thêm Câu Hỏi Trắc Nghiệm</h3>
-                    
-                    <label class="block text-xs font-extrabold text-gray-600 mb-1">Câu hỏi:</label>
-                    <textarea id="inputQ" rows="2" placeholder="VD: Listen! The birds _____ in the tree." class="w-full p-2.5 rounded-xl border-2 border-purple-200 focus:border-purple-500 outline-none text-sm font-bold mb-3"></textarea>
-
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án A:</label>
-                            <input id="inputA" type="text" placeholder="sing" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án B:</label>
-                            <input id="inputB" type="text" placeholder="are singing" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án C:</label>
-                            <input id="inputC" type="text" placeholder="sang" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án D:</label>
-                            <input id="inputD" type="text" placeholder="sings" class="w-full p-2 rounded-xl border border-purple-200 text-sm font-bold">
-                        </div>
-                    </div>
-
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Đáp án đúng:</label>
-                    <select id="inputAns" class="w-full p-2.5 rounded-xl border-2 border-purple-200 bg-white font-extrabold text-purple-700 text-sm mb-4">
-                        <option value="0">Đáp án A</option>
-                        <option value="1">Đáp án B</option>
-                        <option value="2">Đáp án C</option>
-                        <option value="3">Đáp án D</option>
-                    </select>
-
-                    <button onclick="addNewQuestion()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-2.5 rounded-xl shadow transition text-sm">
-                        💾 Lưu Câu Hỏi
+            <!-- Controls & Scoreboards -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                
+                <!-- 1 Player / 2 Teams Mode Toggle -->
+                <div class="bg-slate-100 p-1 rounded-2xl border-2 border-slate-200 flex items-center">
+                    <button id="mode1PBtn" onclick="setGameMode('1P')" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition bg-pink-500 text-white shadow">
+                        <i class="fa-solid fa-user mr-1"></i> 1 PLAYER
+                    </button>
+                    <button id="mode2TeamsBtn" onclick="setGameMode('2TEAMS')" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition text-slate-600 hover:text-pink-600">
+                        <i class="fa-solid fa-users mr-1"></i> 2 TEAMS
                     </button>
                 </div>
 
-                <div class="md:col-span-7 flex flex-col">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-title text-gray-700 font-bold text-lg">📋 Ngân Hàng Câu Hỏi Hiện Tại</h3>
-                        <button onclick="restoreSampleQuestions()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-3 py-1.5 rounded-lg">
-                            Khôi phục mẫu
+                <!-- 1 Player Scoreboard -->
+                <div id="scoreboard1P" class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 bg-amber-50 border-2 border-amber-400 px-3.5 py-1 rounded-2xl">
+                        <i class="fa-solid fa-star text-amber-500 text-lg"></i>
+                        <div>
+                            <span class="text-[10px] text-amber-700 font-bold block leading-none">TOTAL SCORE</span>
+                            <span id="score1PDisplay" class="text-lg font-title font-extrabold text-amber-900">0</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-pink-50 border-2 border-pink-300 px-3.5 py-1 rounded-2xl">
+                        <i class="fa-solid fa-gift text-pink-500 text-lg"></i>
+                        <div>
+                            <span class="text-[10px] text-pink-700 font-bold block leading-none">TEDDIES WON</span>
+                            <span id="count1PDisplay" class="text-lg font-title font-extrabold text-pink-900">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 Teams Scoreboard (Team A vs Team B) -->
+                <div id="scoreboard2Teams" class="hidden items-center gap-2 sm:gap-3">
+                    <!-- Team A -->
+                    <div id="teamACard" onclick="manualSwitchTurn('A')" class="cursor-pointer transition-all flex items-center gap-2.5 bg-rose-50 border-2 border-rose-300 px-3.5 py-1 rounded-2xl team-active-a" title="Click to switch turn to Team A">
+                        <div class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center font-title font-bold text-base shadow">
+                            A
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1">
+                                <span class="text-[11px] font-extrabold text-rose-700 leading-none">TEAM A</span>
+                                <span id="turnBadgeA" class="text-[10px] bg-rose-500 text-white px-1.5 py-0.2 rounded-full font-bold animate-pulse">TURN!</span>
+                            </div>
+                            <span id="scoreTeamADisplay" class="text-lg font-title font-extrabold text-rose-900 leading-tight">0 PTS</span>
+                        </div>
+                    </div>
+
+                    <span class="font-title font-extrabold text-slate-400 text-sm">VS</span>
+
+                    <!-- Team B -->
+                    <div id="teamBCard" onclick="manualSwitchTurn('B')" class="cursor-pointer transition-all flex items-center gap-2.5 bg-sky-50 border-2 border-sky-300 px-3.5 py-1 rounded-2xl opacity-80" title="Click to switch turn to Team B">
+                        <div class="w-8 h-8 rounded-xl bg-sky-500 text-white flex items-center justify-center font-title font-bold text-base shadow">
+                            B
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1">
+                                <span class="text-[11px] font-extrabold text-sky-700 leading-none">TEAM B</span>
+                                <span id="turnBadgeB" class="hidden text-[10px] bg-sky-500 text-white px-1.5 py-0.2 rounded-full font-bold animate-pulse">TURN!</span>
+                            </div>
+                            <span id="scoreTeamBDisplay" class="text-lg font-title font-extrabold text-sky-900 leading-tight">0 PTS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Panel, Reset & Sound Buttons -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openTeacherModal()" class="btn-3d-pink bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-title font-bold px-3.5 py-2 rounded-2xl text-xs sm:text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>TEACHER PANEL (<span id="questionCountBadge">12</span>)</span>
+                    </button>
+
+                    <button onclick="resetScores()" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-slate-300 flex items-center justify-center text-sm transition" title="Reset All Scores">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+
+                    <button id="soundToggleBtn" onclick="toggleSound()" class="w-10 h-10 rounded-2xl bg-indigo-100 hover:bg-indigo-200 text-indigo-600 border-2 border-indigo-300 flex items-center justify-center text-base transition" title="Toggle Sound Effects">
+                        <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT: 3D Teddy Claw Machine + AI Hand Control & Prize Shelf -->
+    <main class="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start my-auto">
+        
+        <!-- LEFT COLUMN (7/12): 3D ARCADE CLAW MACHINE -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+            <div class="w-full max-w-[620px] bg-gradient-to-b from-pink-400 via-pink-500 to-rose-600 rounded-[2.5rem] p-4 sm:p-5 arcade-cabinet relative">
+                
+                <!-- Arcade LED Top Marquee -->
+                <div class="bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-300 rounded-t-3xl py-2 px-4 mb-3 border-4 border-white shadow-inner flex items-center justify-between">
+                    <div class="flex gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+                    </div>
+                    <div id="cabinetTopBanner" class="font-title font-extrabold text-pink-700 tracking-wide text-sm sm:text-base uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-crown text-amber-500"></i>
+                        <span id="cabinetBannerText">3D HUGGING TEDDY CLAW MACHINE</span>
+                        <i class="fa-solid fa-crown text-amber-500"></i>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+                    </div>
+                </div>
+
+                <!-- Glass Display Window with 3D Teddy Plushies Canvas -->
+                <div class="relative w-full aspect-[4/3] bg-gradient-to-b from-indigo-950 via-purple-900 to-pink-900 rounded-2xl overflow-hidden border-4 border-white shadow-inner">
+                    <canvas id="clawCanvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- Glass Reflection Overlay -->
+                    <div class="inset-0 absolute glass-reflection"></div>
+
+                    <!-- Team Turn Pill Badge Inside Machine -->
+                    <div id="inGameTurnPill" class="hidden absolute top-3 right-3 bg-rose-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5">
+                        <i class="fa-solid fa-paw"></i> TURN: TEAM A
+                    </div>
+
+                    <!-- Floating Toast Notification Inside Machine -->
+                    <div id="machineToast" class="absolute top-12 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-5 py-2 rounded-full shadow-xl border-2 border-pink-400 font-title font-bold text-pink-600 text-sm sm:text-base transition-all duration-300 opacity-0 pointer-events-none scale-90 whitespace-nowrap z-20">
+                        Ready to grab a cute 3D Teddy Bear!
+                    </div>
+                </div>
+
+                <!-- Physical Arcade Control Deck -->
+                <div class="mt-4 bg-pink-800/60 rounded-2xl p-3 border-2 border-pink-300/60 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                        <button id="btnLeft" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base" title="Move Left (Left Arrow / A)">
+                            <i class="fa-solid fa-caret-left text-lg"></i> LEFT
+                        </button>
+                        <button id="btnRight" class="btn-3d-blue bg-sky-500 hover:bg-sky-400 text-white font-title font-bold px-4 h-12 rounded-xl flex items-center justify-center gap-1.5 text-sm sm:text-base" title="Move Right (Right Arrow / D)">
+                            RIGHT <i class="fa-solid fa-caret-right text-lg"></i>
                         </button>
                     </div>
-                    <div id="questionListBox" class="space-y-2.5 overflow-y-auto max-h-[380px] pr-1"></div>
+
+                    <div class="text-center hidden sm:block">
+                        <span class="text-[10px] text-pink-100 font-bold block tracking-wider uppercase">CONTROLS</span>
+                        <span class="text-xs font-bold bg-white/20 text-white px-3 py-0.5 rounded-full">
+                            AI Hand Gesture / ⬅️ ➡️ Keys
+                        </span>
+                    </div>
+
+                    <button id="btnDrop" onclick="triggerClawDrop()" class="btn-3d-yellow bg-amber-400 hover:bg-amber-300 text-slate-900 font-title font-extrabold px-5 h-12 rounded-xl flex items-center gap-2 text-base sm:text-lg">
+                        <i class="fa-solid fa-thumbs-up text-amber-800 text-xl"></i>
+                        <span>DROP CLAW!</span>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN (5/12): AI HAND TRACKING CAMERA & TEDDY PRIZE COLLECTION -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+            
+            <!-- AI HAND GESTURE WEBCAM CARD (NON-MIRRORED) -->
+            <div class="bg-white/95 backdrop-blur-md rounded-[2rem] p-4 sm:p-5 shadow-xl border-4 border-indigo-400">
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h2 class="font-title font-extrabold text-indigo-900 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-hand-sparkles text-indigo-500"></i> AI Hand Gesture Control
+                        </h2>
+                    </div>
+                    <button id="toggleCamBtn" onclick="toggleCamera()" class="text-xs font-bold bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-video"></i> <span id="camBtnText">START WEBCAM</span>
+                    </button>
+                </div>
+
+                <!-- Webcam Viewport (Horizontally Flipped to Eliminate Mirror Effect) -->
+                <div class="relative w-full aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-inner">
+                    <video id="webcamVideo" class="hidden" playsinline></video>
+                    <canvas id="webcamCanvas" class="w-full h-full object-cover"></canvas>
+
+                    <!-- Camera Standby Overlay -->
+                    <div id="camOverlay" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center">
+                        <div class="w-14 h-14 rounded-full bg-indigo-500/20 border-2 border-indigo-400 flex items-center justify-center text-indigo-300 text-2xl mb-2.5">
+                            <i class="fa-solid fa-hand-point-up animate-bounce"></i>
+                        </div>
+                        <h3 class="text-white font-title font-bold text-base mb-1">Touchless AI Hand Tracking!</h3>
+                        <p class="text-slate-300 text-xs max-w-xs mb-3.5 leading-relaxed">
+                            Move your hand <b class="text-sky-300">Left / Right</b> in real life to steer the claw (true direction, no mirror confusion). Show a <b class="text-amber-300">Thumbs Up 👍</b> to drop the claw!
+                        </p>
+                        <button onclick="startCamera()" id="startCamMainBtn" class="btn-3d-pink bg-pink-500 hover:bg-pink-400 text-white font-title font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-camera"></i> ENABLE AI WEBCAM
+                        </button>
+                    </div>
+
+                    <!-- Live Gesture Status Bar -->
+                    <div class="absolute bottom-2 inset-x-2 bg-slate-900/85 backdrop-blur-md text-white px-3 py-1.5 rounded-xl flex items-center justify-between border border-white/15">
+                        <span class="text-xs text-slate-300 font-semibold">AI Status:</span>
+                        <span id="gestureStatusBadge" class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info"></i> Camera Off
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Gesture Guide Cards -->
+                <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+                    <div class="bg-sky-50 border border-sky-200 rounded-xl p-2">
+                        <div class="text-base">👈 / 👉</div>
+                        <div class="text-xs font-title font-bold text-sky-800">Hand Left / Right</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Move Claw</div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-2">
+                        <div class="text-base">👍</div>
+                        <div class="text-xs font-title font-bold text-amber-800">Thumbs Up</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Drop Claw</div>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2">
+                        <div class="text-base">🧸✨</div>
+                        <div class="text-xs font-title font-bold text-emerald-800">Answer Quiz</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">Win Aura Teddy!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEDDY COLLECTION SHELF & RESPAWN BUTTON -->
+            <div class="bg-white/95 backdrop-blur-md rounded-[2rem] p-4 sm:p-5 shadow-xl border-4 border-pink-400">
+                <div class="flex items-center justify-between mb-2.5">
+                    <h2 class="font-title font-extrabold text-pink-700 text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> Teddy Bear Collection
+                    </h2>
+                    <button onclick="resetPlushPool()" class="text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5" title="Respawn a fresh batch of 3D Teddy Bears">
+                        <i class="fa-solid fa-rotate"></i> RESPAWN TEDDIES
+                    </button>
+                </div>
+
+                <div id="collectionGrid" class="min-h-[86px] max-h-[145px] overflow-y-auto bg-pink-50/80 border-2 border-dashed border-pink-300 rounded-2xl p-2.5 flex flex-wrap gap-2 items-center justify-center">
+                    <p id="emptyCollectionText" class="text-xs font-semibold text-slate-400 text-center px-2">
+                        No teddy bears collected yet! Grab a hugging teddy bear and answer the English question to win points! Watch out for 0 PTS decoys! 🧸💖
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL 1: ENGLISH QUIZ MODAL WHEN A TEDDY BEAR IS GRABBED -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2.2rem] max-w-lg w-full p-6 sm:p-7 shadow-2xl border-4 border-pink-400 relative overflow-hidden">
+            
+            <!-- Decorative Corner Glow -->
+            <div id="quizAuraCorner" class="absolute -top-12 -right-12 w-36 h-36 rounded-full opacity-25 pointer-events-none bg-amber-400"></div>
+
+            <!-- Grabbed Teddy Info & Point Badge -->
+            <div class="flex items-center justify-between gap-3 mb-4 relative z-10">
+                <div class="flex items-center gap-3.5">
+                    <div id="quizPlushAvatar" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-50 to-pink-100 border-2 border-pink-300 flex items-center justify-center shadow-md floating-avatar relative">
+                        <canvas id="quizBearPreviewCanvas" width="80" height="80" class="w-18 h-18"></canvas>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span id="quizRarityBadge" class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                                ⭐ Legendary Teddy (+100 PTS)
+                            </span>
+                            <span id="quizTurnTeamBadge" class="hidden text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-rose-500 text-white">
+                                TEAM A
+                            </span>
+                        </div>
+                        <h3 id="quizPlushName" class="text-xl font-title font-extrabold text-slate-800 mt-1">
+                            Honey Teddy is on the claw!
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="bg-indigo-50/90 border-2 border-indigo-200 rounded-2xl p-4 mb-4 relative z-10">
+                <div class="flex items-center justify-between mb-1">
+                    <span id="quizTopicBadge" class="text-xs font-bold text-indigo-600 uppercase tracking-wide">
+                        <i class="fa-solid fa-book-open mr-1"></i> English Challenge
+                    </span>
+                    <span id="quizPointsText" class="text-xs font-extrabold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
+                        🎁 Reward: +25 PTS
+                    </span>
+                </div>
+                <p id="quizQuestionText" class="text-base sm:text-lg font-title font-bold text-slate-800 leading-snug mt-1">
+                    What is the English word for "Con Gấu"?
+                </p>
+            </div>
+
+            <!-- 4 Answer Choices (A, B, C, D) -->
+            <div id="quizOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 relative z-10">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Answer Explanation & Feedback Box -->
+            <div id="quizFeedbackBox" class="hidden rounded-2xl p-3.5 text-sm font-semibold mb-1 relative z-10"></div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: TEACHER PANEL (QUESTION BANK & DECOY SETTINGS) -->
+    <div id="teacherModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-5">
+        <div class="bg-white rounded-[2rem] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-indigo-400 overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-6 py-4 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-title font-extrabold leading-none">Teacher Panel • Question & Difficulty Manager</h2>
+                        <p class="text-xs text-indigo-100 mt-0.5">Auto-saved to browser LocalStorage • Customize questions & 0-Point Decoy Bears</p>
+                    </div>
+                </div>
+                <button onclick="closeTeacherModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center text-lg transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Modal Body -->
+            <div class="p-5 overflow-y-auto space-y-5 flex-1">
+
+                <!-- Difficulty & 0-Point Decoy Settings -->
+                <div class="bg-amber-50/80 border-2 border-amber-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-title font-bold text-amber-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-masks-theater text-amber-600"></i> 0-Point Decoy & Mystery Teddy Settings
+                        </h3>
+                        <p class="text-xs text-slate-600">Add tricky 0-Point Decoy Teddies to challenge students' aim!</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-300">
+                            <label class="text-xs font-bold text-slate-700">0-PTS Decoy Count:</label>
+                            <select id="decoyCountSelect" onchange="updateDecoySettings()" class="text-xs font-extrabold text-amber-800 outline-none bg-transparent">
+                                <option value="1">1 Decoy Bear</option>
+                                <option value="2" selected>2 Decoy Bears</option>
+                                <option value="3">3 Decoy Bears</option>
+                                <option value="4">4 Decoy Bears (Hard!)</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-300 cursor-pointer text-xs font-bold text-slate-700">
+                            <input id="disguiseDecoyCheckbox" type="checkbox" onchange="updateDecoySettings()" class="accent-pink-500 w-4 h-4">
+                            <span>Hide "0 PTS" as "? PTS"</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Add / Edit Single Question Form -->
+                <div class="bg-indigo-50/70 border-2 border-indigo-200 rounded-2xl p-4">
+                    <h3 id="formTitleText" class="font-title font-bold text-indigo-900 text-base mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-plus text-indigo-600"></i> Add New Question
+                    </h3>
+                    <input type="hidden" id="editQuestionIndex" value="-1">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Question Prompt *</label>
+                            <input id="inpQuestion" type="text" placeholder="e.g., What is the past tense of 'GO'?" class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Category / Topic (Optional)</label>
+                            <input id="inpTopic" type="text" placeholder="Vocabulary / Grammar..." class="w-full px-3.5 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Option A *</label>
+                            <input id="inpOptA" type="text" placeholder="Went" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Option B *</label>
+                            <input id="inpOptB" type="text" placeholder="Gone" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Option C *</label>
+                            <input id="inpOptC" type="text" placeholder="Goed" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Option D *</label>
+                            <input id="inpOptD" type="text" placeholder="Going" class="w-full px-3 py-1.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Correct Option *</label>
+                            <select id="inpCorrect" class="w-full px-3 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-bold text-indigo-900 bg-white">
+                                <option value="0">Option A</option>
+                                <option value="1">Option B</option>
+                                <option value="2">Option C</option>
+                                <option value="3">Option D</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Short Explanation (Optional)</label>
+                            <input id="inpExplanation" type="text" placeholder="The past simple form of Go is Went." class="w-full px-3 py-2 rounded-xl border-2 border-indigo-200 focus:border-indigo-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="saveSingleQuestion()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-title font-bold py-2 px-4 rounded-xl text-sm transition shadow">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> <span id="saveQuestionBtnText">SAVE QUESTION</span>
+                            </button>
+                            <button id="cancelEditBtn" onclick="resetQuestionForm()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm transition">
+                                CANCEL
+                            </button>
+                        </div>
+                    </div>
+                    <p id="teacherFormNotice" class="text-xs font-bold text-emerald-600 mt-2 hidden"></p>
+                </div>
+
+                <!-- Bulk Import Tool -->
+                <details class="bg-pink-50/80 border-2 border-pink-200 rounded-2xl p-3.5">
+                    <summary class="font-title font-bold text-pink-900 text-sm cursor-pointer flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-import text-pink-600 mr-1.5"></i> Bulk Import Questions (Copy & Paste)</span>
+                        <span class="text-xs font-semibold text-pink-700">Click to expand ▼</span>
+                    </summary>
+                    <div class="mt-3 space-y-2">
+                        <p class="text-xs text-slate-600">
+                            One question per line using pipe <code class="bg-white px-1.5 py-0.5 rounded border text-pink-600 font-bold">Question | Option A | Option B | Option C | Option D | Correct Letter (A/B/C/D) | Explanation</code>
+                        </p>
+                        <textarea id="bulkImportTextarea" rows="3" placeholder="What color is the sun? | Blue | Yellow | Green | Pink | B | The sun is yellow." class="w-full p-3 rounded-xl border-2 border-pink-300 text-xs font-semibold outline-none"></textarea>
+                        <button onclick="handleBulkImport()" class="bg-pink-500 hover:bg-pink-600 text-white font-title font-bold px-4 py-1.5 rounded-xl text-xs transition shadow">
+                            <i class="fa-solid fa-bolt mr-1"></i> IMPORT ALL LINES
+                        </button>
+                    </div>
+                </details>
+
+                <!-- Existing Questions List -->
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                        <h3 class="font-title font-bold text-slate-800 text-base">
+                            Active Question Bank (<span id="modalTotalQuestions">0</span> questions)
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="restoreDefaultQuestions()" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl transition">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> RESTORE DEFAULTS
+                            </button>
+                            <button onclick="clearAllQuestions()" class="text-xs font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 px-3 py-1.5 rounded-xl transition">
+                                <i class="fa-solid fa-trash-can mr-1"></i> CLEAR ALL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="teacherQuestionsList" class="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-3 border-t flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500">
+                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Changes are automatically saved in this browser.
+                </span>
+                <button onclick="closeTeacherModal()" class="bg-pink-500 hover:bg-pink-600 text-white font-title font-bold px-6 py-2 rounded-xl text-sm shadow transition">
+                    DONE & RETURN TO GAME
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="max-w-7xl w-full mx-auto text-center text-xs font-semibold text-slate-500 mt-3 py-1">
+        3D Hugging Teddy Bear Claw Machine 💖 • Diverse Point Tiers (0 PTS Decoys to +100 PTS) • 1P & 2-Team Classroom Mode
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        /* ==============================================================
-           1. DANH MỤC THÚ BÔNG 3D & QUÀ
-           ============================================================== */
-        const PLUSHIE_TYPES = [
-            { id: 'pink_bear', name: 'Gấu Dâu 3D', primary: '#fb7185', secondary: '#ffe4e6', ear: '#e11d48', type: 'bear' },
-            { id: 'brown_bear', name: 'Gấu Nâu Brownie', primary: '#b45309', secondary: '#fef3c7', ear: '#78350f', type: 'bear' },
-            { id: 'white_bunny', name: 'Thỏ Ngọc', primary: '#f8fafc', secondary: '#fce7f3', ear: '#f472b6', type: 'bunny' },
-            { id: 'mint_frog', name: 'Ếch Cốm', primary: '#4ade80', secondary: '#dcfce7', ear: '#16a34a', type: 'frog' },
-            { id: 'yellow_chick', name: 'Vịt Vàng', primary: '#facc15', secondary: '#fef9c3', ear: '#f97316', type: 'chick' },
-            { id: 'purple_cat', name: 'Mèo Tím', primary: '#c084fc', secondary: '#f3e8ff', ear: '#9333ea', type: 'cat' }
-        ];
-
-        const GIFT_TIERS = [
-            { label: '👑 Siêu Cấp +50đ', bonus: 50, badge: '👑 +50đ', color: 'bg-gradient-to-r from-amber-400 to-rose-500 text-white', special: true },
-            { label: '💎 Kim Cương +30đ', bonus: 30, badge: '💎 +30đ', color: 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white', special: true },
-            { label: '🎁 Hộp Quà +20đ', bonus: 20, badge: '🎁 +20đ', color: 'bg-pink-500 text-white', special: true },
-            { label: '🍬 Kẹo Ngọt +15đ', bonus: 15, badge: '🍬 +15đ', color: 'bg-purple-500 text-white', special: false }
-        ];
-
-        function pickRandomGift() {
-            const r = Math.random();
-            if (r < 0.2) return GIFT_TIERS[0];
-            if (r < 0.45) return GIFT_TIERS[1];
-            if (r < 0.75) return GIFT_TIERS[2];
-            return GIFT_TIERS[3];
-        }
-
-        function create3DPlushSVG(model, uid, size = 66, gift = null) {
-            const gradId = `grad_${model.id}_${uid}`;
-            let earsMarkup = '';
-            if (model.type === 'bunny') {
-                earsMarkup = `<ellipse cx="32" cy="18" rx="9" ry="18" transform="rotate(-12 32 18)" fill="url(#${gradId})"/><ellipse cx="68" cy="18" rx="9" ry="18" transform="rotate(12 68 18)" fill="url(#${gradId})"/>`;
-            } else if (model.type === 'cat') {
-                earsMarkup = `<polygon points="20,38 24,12 44,28" fill="url(#${gradId})"/><polygon points="80,38 76,12 56,28" fill="url(#${gradId})"/>`;
-            } else {
-                earsMarkup = `<circle cx="25" cy="24" r="12" fill="url(#${gradId})"/><circle cx="75" cy="24" r="12" fill="url(#${gradId})"/>`;
-            }
-
-            const giftTagHTML = gift ? `<div class="absolute -top-2.5 left-1/2 -translate-x-1/2 ${gift.color} text-[9px] font-black px-1.5 py-0.5 rounded-full shadow border border-white whitespace-nowrap z-20">${gift.badge}</div>` : '';
-
-            return `
-            <div class="relative inline-flex items-center justify-center">
-                ${giftTagHTML}
-                <svg width="${size}" height="${size}" viewBox="0 0 100 100" class="overflow-visible select-none">
-                    <defs>
-                        <radialGradient id="${gradId}" cx="32%" cy="25%" r="72%"><stop offset="0%" stop-color="#fff"/><stop offset="30%" stop-color="${model.primary}"/><stop offset="100%" stop-color="${model.ear}"/></radialGradient>
-                    </defs>
-                    <ellipse cx="50" cy="93" rx="28" ry="6" fill="rgba(0,0,0,0.2)"/>
-                    <ellipse cx="50" cy="74" rx="25" ry="19" fill="url(#${gradId})"/>
-                    ${earsMarkup}
-                    <ellipse cx="50" cy="45" rx="31" ry="26" fill="url(#${gradId})"/>
-                    <circle cx="36" cy="45" r="4.8" fill="#0f172a"/><circle cx="64" cy="45" r="4.8" fill="#0f172a"/>
-                </svg>
-            </div>`;
-        }
-
-        /* ==============================================================
-           2. ÂM THANH & PHÁO HOA
-           ============================================================== */
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        /********************************************************************
+         * 1. WEB AUDIO SYNTHESIZER (NO EXTERNAL SOUND FILES REQUIRED)
+         ********************************************************************/
+        let soundEnabled = true;
         let audioCtx = null;
 
-        function playTone(type) {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const now = audioCtx.currentTime;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
 
-            if (type === 'win') {
-                [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(f, now + idx * 0.08);
-                    gain.gain.setValueAtTime(0.18, now + idx * 0.08);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(now + idx * 0.08); osc.stop(now + idx * 0.08 + 0.3);
-                });
-            } else if (type === 'slip') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(380, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.35);
-                gain.gain.setValueAtTime(0.12, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.35);
+        function playTone(freq, type, duration, delay = 0, vol = 0.14) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+
+                gain.gain.setValueAtTime(0.001, ctx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + delay + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + duration + 0.02);
+            } catch (e) {}
+        }
+
+        function playSoundEffect(effect) {
+            if (!soundEnabled) return;
+            if (effect === 'drop') {
+                playTone(587.33, 'triangle', 0.1, 0);
+                playTone(440.00, 'triangle', 0.1, 0.08);
+                playTone(329.63, 'triangle', 0.18, 0.16);
+            } else if (effect === 'grab') {
+                playTone(392.00, 'sine', 0.1, 0);
+                playTone(523.25, 'sine', 0.1, 0.08);
+                playTone(659.25, 'triangle', 0.2, 0.16);
+            } else if (effect === 'win') {
+                playTone(523.25, 'triangle', 0.12, 0, 0.18);
+                playTone(659.25, 'triangle', 0.12, 0.1, 0.18);
+                playTone(783.99, 'triangle', 0.12, 0.2, 0.18);
+                playTone(1046.50, 'sine', 0.35, 0.3, 0.22);
+            } else if (effect === 'zero') {
+                playTone(311.13, 'sawtooth', 0.16, 0, 0.12);
+                playTone(261.63, 'sawtooth', 0.26, 0.16, 0.12);
+            } else if (effect === 'fail') {
+                playTone(349.23, 'sawtooth', 0.18, 0, 0.12);
+                playTone(277.18, 'sawtooth', 0.32, 0.18, 0.12);
+            } else if (effect === 'miss') {
+                playTone(220.00, 'sine', 0.15, 0, 0.1);
             }
         }
 
-        function triggerMegaFireworks() {
-            confetti({ particleCount: 120, spread: 90, origin: { y: 0.6, x: 0.1 } });
-            confetti({ particleCount: 120, spread: 90, origin: { y: 0.6, x: 0.9 } });
-            setTimeout(() => {
-                confetti({
-                    particleCount: 180,
-                    spread: 120,
-                    startVelocity: 45,
-                    origin: { y: 0.5, x: 0.5 },
-                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
-                });
-            }, 350);
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-rose-500';
         }
 
-        /* ==============================================================
-           3. QUẢN LÝ 2 ĐỘI & ĐIỂM SỐ
-           ============================================================== */
-        let activeTeam = 'red';
-        let teamScores = { red: 0, blue: 0 };
-        let teamBaskets = { red: [], blue: [] };
+        /********************************************************************
+         * 2. QUESTION BANK & TEACHER PANEL STORAGE
+         ********************************************************************/
+        const STORAGE_KEY_QUESTIONS = 'CLAW_ENGLISH_TEACHER_QUESTIONS_V3';
 
-        function setActiveTeam(team) {
-            activeTeam = team;
-            const btnRed = document.getElementById('teamRedBtn');
-            const btnBlue = document.getElementById('teamBlueBtn');
-            if (team === 'red') {
-                btnRed.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-500 bg-red-500 text-white shadow';
-                btnBlue.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-200 bg-white text-blue-600';
-            } else {
-                btnBlue.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-blue-500 bg-blue-500 text-white shadow';
-                btnRed.className = 'px-4 py-1.5 rounded-xl font-title font-extrabold text-xs transition border-2 border-red-200 bg-white text-red-600';
+        const defaultQuestionBank = [
+            {
+                topic: "Vocabulary • Animals",
+                question: "Which animal is black and white and loves eating bamboo?",
+                options: ["A. Panda", "B. Tiger", "C. Monkey", "D. Giraffe"],
+                correct: 0,
+                explanation: "Correct! Giant Pandas have black-and-white fur and love eating bamboo."
+            },
+            {
+                topic: "Idioms • Feelings",
+                question: "When you win a giant teddy bear, you feel 'over the moon'. What does that mean?",
+                options: ["A. Very sleepy", "B. Extremely happy", "C. Flying in space", "D. Very angry"],
+                correct: 1,
+                explanation: "'Over the moon' is an idiom that means extremely happy and delighted!"
+            },
+            {
+                topic: "Grammar • Present Simple",
+                question: "Choose the correct verb form: 'She _____ hugging cute teddy bears every day.'",
+                options: ["A. love", "B. loving", "C. loves", "D. to love"],
+                correct: 2,
+                explanation: "With third-person singular subject 'She' in Present Simple, we add '-s' -> loves."
+            },
+            {
+                topic: "Conversation • Politeness",
+                question: "If your friend says: 'Thank you so much for this lovely teddy bear!', what should you say?",
+                options: ["A. You're welcome!", "B. Good night!", "C. See you yesterday!", "D. I amhungry."],
+                correct: 0,
+                explanation: "'You're welcome!' is the polite response when someone thanks you."
+            },
+            {
+                topic: "Vocabulary • Opposites",
+                question: "What is the opposite (antonym) of the word 'EXPENSIVE'?",
+                options: ["A. Heavy", "B. Cheap", "C. Fast", "D. Tall"],
+                correct: 1,
+                explanation: "'Cheap' (inexpensive) is the opposite of 'Expensive'."
+            },
+            {
+                topic: "Grammar • Prepositions",
+                question: "Fill in the blank: 'My birthday is _____ October.'",
+                options: ["A. on", "B. at", "C. in", "D. to"],
+                correct: 2,
+                explanation: "We always use the preposition 'in' before months of the year (in October)."
+            },
+            {
+                topic: "Grammar • Past Simple",
+                question: "What is the Past Simple (V2) form of the verb 'BUY'?",
+                options: ["A. Buyed", "B. Bought", "C. Brought", "D. Catch"],
+                correct: 1,
+                explanation: "The past tense of 'buy' is 'bought' (while 'brought' is the past tense of 'bring')."
+            },
+            {
+                topic: "Vocabulary • Nature",
+                question: "What colorful arc appears in the sky after it rains when the sun shines?",
+                options: ["A. Thunder", "B. Cloud", "C. Rainbow", "D. Snow"],
+                correct: 2,
+                explanation: "A 'Rainbow' has seven beautiful colors and appears after rain!"
+            },
+            {
+                topic: "Grammar • Comparatives",
+                question: "Choose the correct sentence: 'A rabbit is _____ than a turtle.'",
+                options: ["A. fast", "B. faster", "C. more fast", "D. fastest"],
+                correct: 1,
+                explanation: "'Fast' is a short adjective, so we add '-er' to make the comparative form 'faster'."
+            },
+            {
+                topic: "Idioms • Everyday English",
+                question: "What does the idiom 'A piece of cake' mean?",
+                options: ["A. Something very easy", "B. A broken cake", "C. Something very hard", "D. A birthday party"],
+                correct: 0,
+                explanation: "'A piece of cake' means something is very easy to do!"
+            },
+            {
+                topic: "Vocabulary • Jobs",
+                question: "Who is a doctor that takes care of sick animals and pets?",
+                options: ["A. Architect", "B. Veterinarian (Vet)", "C. Chef", "D. Pilot"],
+                correct: 1,
+                explanation: "A 'Veterinarian' (or Vet) is an animal doctor!"
+            },
+            {
+                topic: "Speaking • Hobbies",
+                question: "What does the question 'What do you do in your free time?' ask about?",
+                options: ["A. Your hobbies", "B. The current time", "C. The price of a toy", "D. Your home address"],
+                correct: 0,
+                explanation: "'Free time' means leisure time, so this question asks about your hobbies."
             }
-            setStatus(`Đang tới lượt gắp của ${team === 'red' ? 'ĐỘI ĐỎ 🔴' : 'ĐỘI XANH 🔵'}!`);
-        }
-
-        /* ==============================================================
-           4. DỮ LIỆU CÂU HỎI
-           ============================================================== */
-        const SAMPLE_QUESTIONS = [
-            { q: "She _______ to school by bike every day.", options: ["go", "goes", "going", "went"], answer: 1 },
-            { q: "Look! The cute bunny _______ a carrot right now.", options: ["eats", "ate", "is eating", "eating"], answer: 2 },
-            { q: "They _______ a big teddy bear yesterday.", options: ["bought", "buy", "buys", "buying"], answer: 0 }
         ];
-        let questions = JSON.parse(localStorage.getItem('claw5d_questions')) || SAMPLE_QUESTIONS;
-        let pendingPrize = null;
-        let turnsUntilAutoShuffle = 2;
 
-        function syncQuestionStorage() {
-            localStorage.setItem('claw5d_questions', JSON.stringify(questions));
-            document.getElementById('qCountBadge').innerText = questions.length;
-        }
+        let questionBank = [];
+        let usedQuestionIndices = [];
+        let decoyCountSetting = 2;
+        let disguiseDecoysAsMystery = false;
 
-        /* ==============================================================
-           5. MÁY GẮP THÚ
-           ============================================================== */
-        let pitPlushies = [];
-        let uidSeed = 1;
-        let clawX = 250;
-        let moveDir = 0;
-        let moveTimer = null;
-        let isClawBusy = false;
-        let activeGrabbedPlush = null;
-        const CHUTE_CENTER_X = 58;
-
-        function spawnPlushiePile() {
-            const pit = document.getElementById('plushPit');
-            pit.innerHTML = '';
-            pitPlushies = [];
-            const cabinetW = document.getElementById('machineCabinet').clientWidth;
-            const minX = 152, maxX = cabinetW - 42;
-            const layers = [{ count: 7, bottomY: 8, z: 11 }, { count: 6, bottomY: 38, z: 12 }, { count: 5, bottomY: 70, z: 13 }];
-
-            layers.forEach((layer) => {
-                const step = (maxX - minX) / Math.max(1, layer.count - 1);
-                for (let i = 0; i < layer.count; i++) {
-                    const model = PLUSHIE_TYPES[Math.floor(Math.random() * PLUSHIE_TYPES.length)];
-                    const gift = pickRandomGift();
-                    const x = Math.max(minX, Math.min(maxX, minX + i * step + (Math.random() * 20 - 10)));
-                    const bottom = Math.max(6, layer.bottomY + (Math.random() * 8 - 4));
-                    const uid = uidSeed++;
-                    const id = 'p3d_' + uid;
-
-                    const wrapper = document.createElement('div');
-                    wrapper.id = id;
-                    wrapper.className = `absolute plush-3d ${gift.special ? 'plush-has-gift' : ''}`;
-                    wrapper.style.left = `${x}px`;
-                    wrapper.style.bottom = `${bottom}px`;
-                    wrapper.style.zIndex = layer.z;
-                    wrapper.innerHTML = create3DPlushSVG(model, uid, 68, gift);
-                    pit.appendChild(wrapper);
-
-                    pitPlushies.push({ id, uid, model, gift, x, bottom, z: layer.z, el: wrapper });
+        function loadQuestionsFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_QUESTIONS);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        questionBank = parsed;
+                        updateQuestionBadgeCount();
+                        return;
+                    }
                 }
-            });
+            } catch (e) {}
+            questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
+            saveQuestionsToStorage();
         }
 
-        async function shufflePlushies(reason = 'manual') {
-            if (isClawBusy) return;
-            isClawBusy = true;
-            playTone('win');
-            spawnPlushiePile();
-            turnsUntilAutoShuffle = 2;
-            document.getElementById('shuffleCountText').innerText = `Tự xốc đảo sau: 2 lượt`;
-            setStatus("🌪️ Đã xốc đảo toàn bộ thú bông và nạp quà mới!");
-            await window.setTimeout(() => { isClawBusy = false; }, 600);
+        function saveQuestionsToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(questionBank));
+            } catch (e) {}
+            updateQuestionBadgeCount();
         }
 
-        function renderClawX() {
-            const cabinetW = document.getElementById('machineCabinet').clientWidth;
-            clawX = Math.max(145, Math.min(cabinetW - 40, clawX));
-            document.getElementById('clawAssembly').style.left = `${clawX}px`;
+        function updateQuestionBadgeCount() {
+            document.getElementById('questionCountBadge').textContent = questionBank.length;
+            const modalCount = document.getElementById('modalTotalQuestions');
+            if (modalCount) modalCount.textContent = questionBank.length;
         }
 
-        function startMove(dir) {
-            if (isClawBusy) return;
-            moveDir = dir;
-            if (moveTimer) clearInterval(moveTimer);
-            moveTimer = setInterval(() => {
-                clawX += moveDir * 5.5;
-                renderClawX();
-            }, 22);
-        }
-
-        function stopMove() {
-            moveDir = 0;
-            if (moveTimer) { clearInterval(moveTimer); moveTimer = null; }
-        }
-
-        // BỎ HOÀN TOÀN PHÍM SPACE - CHỈ DÙNG MŨI TÊN DỰ PHÒNG
-        window.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            if (e.key === 'ArrowLeft') startMove(-1);
-            if (e.key === 'ArrowRight') startMove(1);
-        });
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') stopMove();
-        });
-
-        async function startClawSequence() {
-            if (isClawBusy) return;
-            if (pendingPrize) {
-                setStatus("🎁 Hãy bấm nhận thú về rổ của đội trước khi gắp tiếp!");
-                return;
+        function getNextQuestion() {
+            if (questionBank.length === 0) {
+                questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
             }
-            if (questions.length === 0) { alert("Chưa có câu hỏi!"); return; }
-
-            stopMove();
-            isClawBusy = true;
-            const clawHead = document.getElementById('clawHead');
-            const heldSlot = document.getElementById('clawHeldSlot');
-
-            clawHead.classList.remove('claw-grab');
-            clawHead.classList.add('claw-open');
-            setStatus("Đang hạ càng gắp xuống...");
-
-            let candidate = null;
-            pitPlushies.forEach(p => {
-                if (Math.abs(p.x - clawX) <= 34) candidate = p;
-            });
-
-            const dropDepth = candidate ? Math.max(150, 260 - candidate.bottom) : 265;
-            await animateCableHeight(28, dropDepth, 600);
-
-            clawHead.classList.remove('claw-open');
-            clawHead.classList.add('claw-grab');
-            await window.setTimeout(() => {}, 250);
-
-            if (!candidate || Math.abs(candidate.x - clawX) > 28) {
-                playTone('slip');
-                setStatus("Gắp trượt rồi!");
-                await animateCableHeight(dropDepth, 28, 550);
-                clawHead.classList.remove('claw-grab');
-                isClawBusy = false;
-                return;
+            if (usedQuestionIndices.length >= questionBank.length) {
+                usedQuestionIndices = [];
             }
-
-            activeGrabbedPlush = candidate;
-            candidate.el.classList.add('hidden');
-            heldSlot.innerHTML = `<div class="plush-struggle">${create3DPlushSVG(candidate.model, 'held', 70, candidate.gift)}</div>`;
-
-            await animateCableHeight(dropDepth, 28, 700);
-            await animateClawHorizontal(clawX, CHUTE_CENTER_X, 800);
-            openGrammarQuizForPlush(candidate);
+            const available = questionBank
+                .map((q, idx) => ({ q, idx }))
+                .filter(item => !usedQuestionIndices.includes(item.idx));
+            const chosen = available[Math.floor(Math.random() * available.length)];
+            usedQuestionIndices.push(chosen.idx);
+            return chosen.q;
         }
 
-        function animateCableHeight(fromH, toH, duration) {
-            return new Promise(res => {
-                const c = document.getElementById('clawCable');
-                const start = performance.now();
-                function step(now) {
-                    const p = Math.min(1, (now - start) / duration);
-                    c.style.height = `${fromH + (toH - fromH) * p}px`;
-                    if (p < 1) requestAnimationFrame(step); else res();
-                }
-                requestAnimationFrame(step);
-            });
+        function updateDecoySettings() {
+            decoyCountSetting = parseInt(document.getElementById('decoyCountSelect').value, 10) || 2;
+            disguiseDecoysAsMystery = document.getElementById('disguiseDecoyCheckbox').checked;
+            if (claw.state === 'IDLE') {
+                initPlushies();
+                showMachineToast(`Updated! Spawned ${decoyCountSetting} Decoy Bear(s)! 🧸`);
+            }
         }
 
-        function animateClawHorizontal(fromX, toX, duration) {
-            return new Promise(res => {
-                const a = document.getElementById('clawAssembly');
-                const start = performance.now();
-                function step(now) {
-                    const p = Math.min(1, (now - start) / duration);
-                    a.style.left = `${fromX + (toX - fromX) * p}px`;
-                    if (p < 1) requestAnimationFrame(step); else res();
-                }
-                requestAnimationFrame(step);
-            });
-        }
+        /********************************************************************
+         * 3. GAME MODES: 1 PLAYER VS 2 TEAMS (TEAM A VS TEAM B)
+         ********************************************************************/
+        let gameMode = '1P';
+        let currentTeamTurn = 'A';
+        let score1P = 0;
+        let count1P = 0;
+        let scoreTeamA = 0;
+        let scoreTeamB = 0;
 
-        /* ==============================================================
-           6. CÂU HỎI & TRẢ THƯỞNG
-           ============================================================== */
-        function openGrammarQuizForPlush(plushObj) {
-            const modal = document.getElementById('quizModal');
-            const qItem = questions[Math.floor(Math.random() * questions.length)];
+        function setGameMode(mode) {
+            gameMode = mode;
+            const btn1P = document.getElementById('mode1PBtn');
+            const btn2T = document.getElementById('mode2TeamsBtn');
+            const board1P = document.getElementById('scoreboard1P');
+            const board2T = document.getElementById('scoreboard2Teams');
+            const turnPill = document.getElementById('inGameTurnPill');
 
-            document.getElementById('quizPlushPreview').innerHTML = create3DPlushSVG(plushObj.model, 'quiz', 56);
-            document.getElementById('quizGiftBadge').innerText = plushObj.gift.label;
-            document.getElementById('quizQuestionText').innerText = qItem.q;
-
-            const fb = document.getElementById('quizFeedbackBox');
-            fb.classList.add('hidden');
-
-            const optBox = document.getElementById('quizOptionsBox');
-            optBox.innerHTML = '';
-            const letters = ['A', 'B', 'C', 'D'];
-
-            qItem.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-pink-200 hover:border-pink-500 bg-pink-50/60 font-extrabold text-gray-800 transition flex items-center gap-3 shadow-sm';
-                btn.innerHTML = `<span class="w-8 h-8 rounded-xl bg-pink-500 text-white font-title font-bold flex items-center justify-center shrink-0">${letters[idx]}</span><span>${opt}</span>`;
-                btn.onclick = () => checkGrammarAnswer(idx, qItem.answer, btn, optBox);
-                optBox.appendChild(btn);
-            });
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function checkGrammarAnswer(chosenIdx, rightIdx, btn, optBox) {
-            Array.from(optBox.children).forEach(b => b.disabled = true);
-            const fb = document.getElementById('quizFeedbackBox');
-            fb.classList.remove('hidden');
-
-            if (chosenIdx === rightIdx) {
-                playTone('win');
-                triggerMegaFireworks();
-
-                const bonus = activeGrabbedPlush ? activeGrabbedPlush.gift.bonus : 10;
-                teamScores[activeTeam] += bonus;
-                document.getElementById('scoreRed').innerText = teamScores.red;
-                document.getElementById('scoreBlue').innerText = teamScores.blue;
-
-                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-100 font-extrabold text-emerald-900 flex items-center gap-3';
-                fb.className = 'mt-4 p-3.5 rounded-2xl text-center font-extrabold text-sm bg-emerald-100 text-emerald-800';
-                fb.innerText = `🎉 CHÍNH XÁC! Pháo hoa chúc mừng ${activeTeam === 'red' ? 'Đội Đỏ' : 'Đội Xanh'}!`;
-
-                setTimeout(async () => {
-                    document.getElementById('quizModal').classList.add('hidden');
-                    document.getElementById('quizModal').classList.remove('flex');
-                    await dropPlushIntoChuteAndOut();
-                }, 1400);
+            if (mode === '1P') {
+                btn1P.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition bg-pink-500 text-white shadow";
+                btn2T.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition text-slate-600 hover:text-pink-600";
+                board1P.classList.remove('hidden');
+                board1P.classList.add('flex');
+                board2T.classList.add('hidden');
+                board2T.classList.remove('flex');
+                turnPill.classList.add('hidden');
+                document.getElementById('cabinetBannerText').textContent = "3D HUGGING TEDDY CLAW MACHINE";
+                showMachineToast("Switched to 1 Player Mode! 🎮");
             } else {
-                playTone('slip');
-                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-100 font-extrabold text-rose-900 flex items-center gap-3';
-                optBox.children[rightIdx].className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-extrabold text-emerald-800 flex items-center gap-3';
-                fb.className = 'mt-4 p-3.5 rounded-2xl text-center font-extrabold text-sm bg-rose-100 text-rose-700';
-                fb.innerText = '😢 Tiếc quá chưa đúng rồi!';
-
-                setTimeout(() => {
-                    document.getElementById('quizModal').classList.add('hidden');
-                    document.getElementById('quizModal').classList.remove('flex');
-                    document.getElementById('clawHead').classList.remove('claw-grab');
-                    document.getElementById('clawHeldSlot').innerHTML = '';
-                    if (activeGrabbedPlush) activeGrabbedPlush.el.classList.remove('hidden');
-                    activeGrabbedPlush = null;
-                    isClawBusy = false;
-                }, 1600);
+                btn2T.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition bg-indigo-600 text-white shadow";
+                btn1P.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-title font-bold transition text-slate-600 hover:text-pink-600";
+                board1P.classList.add('hidden');
+                board1P.classList.remove('flex');
+                board2T.classList.remove('hidden');
+                board2T.classList.add('flex');
+                turnPill.classList.remove('hidden');
+                updateTeamTurnUI();
+                showMachineToast("2 Teams Battle Mode: Team A vs Team B! 🏆");
             }
         }
 
-        async function dropPlushIntoChuteAndOut() {
-            const heldSlot = document.getElementById('clawHeldSlot');
-            if (heldSlot.firstElementChild) heldSlot.firstElementChild.className = 'animate-chute-drop';
-            await window.setTimeout(() => {}, 650);
+        function updateTeamTurnUI() {
+            const cardA = document.getElementById('teamACard');
+            const cardB = document.getElementById('teamBCard');
+            const badgeA = document.getElementById('turnBadgeA');
+            const badgeB = document.getElementById('turnBadgeB');
+            const turnPill = document.getElementById('inGameTurnPill');
+            const bannerText = document.getElementById('cabinetBannerText');
 
-            heldSlot.innerHTML = '';
-            pitPlushies = pitPlushies.filter(p => p.id !== activeGrabbedPlush.id);
-            activeGrabbedPlush.el.remove();
-
-            pendingPrize = activeGrabbedPlush;
-            activeGrabbedPlush = null;
-            renderPendingPrizeInTray();
-
-            setStatus(`🎁 Thú đã rơi xuống Cửa Lấy Quà! Bấm nhận về rổ của ${activeTeam === 'red' ? 'Đội Đỏ' : 'Đội Xanh'}!`);
-            await animateClawHorizontal(CHUTE_CENTER_X, clawX, 550);
-            isClawBusy = false;
-        }
-
-        function renderPendingPrizeInTray() {
-            const tray = document.getElementById('prizeTraySlot');
-            document.getElementById('btnClaimRed').classList.remove('hidden');
-            document.getElementById('btnClaimBlue').classList.remove('hidden');
-
-            if (!pendingPrize) {
-                tray.innerHTML = `<span class="text-[11px] text-slate-400 font-bold text-center px-1">Thả thú xuống đây</span>`;
-                document.getElementById('btnClaimRed').classList.add('hidden');
-                document.getElementById('btnClaimBlue').classList.add('hidden');
-                return;
-            }
-
-            tray.innerHTML = `<div class="transform scale-90">${create3DPlushSVG(pendingPrize.model, 'tray', 52, pendingPrize.gift)}</div>`;
-        }
-
-        function assignPrizeToTeam(team) {
-            if (!pendingPrize) return;
-            teamBaskets[team].push(pendingPrize);
-            pendingPrize = null;
-            renderPendingPrizeInTray();
-            renderTeamBaskets();
-            setStatus(`🧺 Đã chuyển thú vào rổ của ${team === 'red' ? 'Đội Đỏ 🔴' : 'Đội Xanh 🔵'}!`);
-        }
-
-        function renderTeamBaskets() {
-            document.getElementById('countRed').innerText = teamBaskets.red.length;
-            document.getElementById('countBlue').innerText = teamBaskets.blue.length;
-
-            const gridRed = document.getElementById('basketRedGrid');
-            gridRed.innerHTML = teamBaskets.red.length === 0 ? `<span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>` : '';
-            teamBaskets.red.forEach((item, idx) => {
-                gridRed.innerHTML += `<div class="flex justify-center">${create3DPlushSVG(item.model, 'red_' + idx, 38)}</div>`;
-            });
-
-            const gridBlue = document.getElementById('basketBlueGrid');
-            gridBlue.innerHTML = teamBaskets.blue.length === 0 ? `<span class="col-span-full text-[11px] text-gray-400 text-center my-auto">Trống</span>` : '';
-            teamBaskets.blue.forEach((item, idx) => {
-                gridBlue.innerHTML += `<div class="flex justify-center">${create3DPlushSVG(item.model, 'blue_' + idx, 38)}</div>`;
-            });
-        }
-
-        function setStatus(text) { document.getElementById('statusText').innerText = text; }
-
-        /* ==============================================================
-           7. BỘ XỬ LÝ THỊ GIÁC MÁY TÍNH THUẦN (PURE WEBCAM VISION ENGINE)
-           Không phụ thuộc MediaPipe / File ngoài - Chạy tức thì 100%
-           ============================================================== */
-        let lastGrabTriggerTime = 0;
-
-        function updateThumbHUD(percent) {
-            const bar = document.getElementById('thumbBar');
-            const val = document.getElementById('thumbVal');
-            const p = Math.max(0, Math.min(100, Math.round(percent)));
-            bar.style.width = `${p}%`;
-            val.innerText = `${p}%`;
-
-            if (p >= 55) {
-                bar.className = 'h-full bg-emerald-400 transition-all duration-75';
+            if (currentTeamTurn === 'A') {
+                cardA.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-rose-50 border-2 border-rose-400 px-3.5 py-1 rounded-2xl team-active-a";
+                cardB.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-sky-50 border-2 border-sky-200 px-3.5 py-1 rounded-2xl opacity-75";
+                badgeA.classList.remove('hidden');
+                badgeB.classList.add('hidden');
+                turnPill.className = "absolute top-3 right-3 bg-rose-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5";
+                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> TURN: TEAM A`;
+                if (gameMode === '2TEAMS') bannerText.textContent = "CURRENT TURN: TEAM A (PINK)";
             } else {
-                bar.className = 'h-full bg-amber-400 transition-all duration-75';
+                cardB.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-sky-50 border-2 border-sky-400 px-3.5 py-1 rounded-2xl team-active-b";
+                cardA.className = "cursor-pointer transition-all flex items-center gap-2.5 bg-rose-50 border-2 border-rose-200 px-3.5 py-1 rounded-2xl opacity-75";
+                badgeB.classList.remove('hidden');
+                badgeA.classList.add('hidden');
+                turnPill.className = "absolute top-3 right-3 bg-sky-500/95 text-white font-title font-bold text-xs sm:text-sm px-3.5 py-1 rounded-full border-2 border-white shadow-md z-10 flex items-center gap-1.5";
+                turnPill.innerHTML = `<i class="fa-solid fa-paw"></i> TURN: TEAM B`;
+                if (gameMode === '2TEAMS') bannerText.textContent = "CURRENT TURN: TEAM B (BLUE)";
             }
         }
 
-        function triggerThumbsUpGrab() {
-            const now = Date.now();
-            if (now - lastGrabTriggerTime > 3000 && !isClawBusy) {
-                lastGrabTriggerTime = now;
+        function switchTeamTurn() {
+            if (gameMode !== '2TEAMS') return;
+            currentTeamTurn = currentTeamTurn === 'A' ? 'B' : 'A';
+            updateTeamTurnUI();
+        }
 
-                const alertBox = document.getElementById('thumbLockAlert');
-                alertBox.classList.remove('hidden');
-                alertBox.classList.add('flex');
-                setTimeout(() => {
-                    alertBox.classList.add('hidden');
-                    alertBox.classList.remove('flex');
-                }, 700);
+        function manualSwitchTurn(team) {
+            if (claw.state !== 'IDLE') return;
+            currentTeamTurn = team;
+            updateTeamTurnUI();
+            showMachineToast(`Switched turn to Team ${team}! 👏`);
+        }
 
-                startClawSequence();
+        function resetScores() {
+            score1P = 0;
+            count1P = 0;
+            scoreTeamA = 0;
+            scoreTeamB = 0;
+            document.getElementById('score1PDisplay').textContent = '0';
+            document.getElementById('count1PDisplay').textContent = '0';
+            document.getElementById('scoreTeamADisplay').textContent = '0 PTS';
+            document.getElementById('scoreTeamBDisplay').textContent = '0 PTS';
+            showMachineToast("All scores have been reset to 0! 🔄");
+        }
+
+        /********************************************************************
+         * 4. FULL-BODY SITTING HUGGING 3D TEDDY BEAR RENDERER + AURA & TIERS
+         *    (Designed to match the exact sitting open-arms teddy reference!)
+         ********************************************************************/
+        const canvas = document.getElementById('clawCanvas');
+        const ctx = canvas.getContext('2d');
+        const GAME_W = 600;
+        const GAME_H = 450;
+        canvas.width = GAME_W;
+        canvas.height = GAME_H;
+
+        const CHUTE = {
+            x: 16,
+            y: 312,
+            width: 112,
+            height: 123,
+            dropTargetX: 72
+        };
+
+        const claw = {
+            x: 330,
+            y: 52,
+            minX: 162,
+            maxX: 552,
+            baseY: 52,
+            maxY: 378,
+            speedX: 4.6,
+            speedY: 5.6,
+            state: 'IDLE',
+            prongAngle: 0.46,
+            grabbedPlush: null,
+            moveDir: 0
+        };
+
+        // Diverse Teddy Bear Catalog based on the exact sitting hugging teddy bear design
+        const TEDDY_CATALOG = [
+            // 0 PTS DECOY TEDDY BEAR
+            {
+                tier: 'DECOY',
+                tierLabel: 'Decoy Teddy',
+                points: 0,
+                isDecoy: true,
+                isMystery: false,
+                auraColor: '#94a3b8',
+                auraGlow: 'rgba(148, 163, 184, 0.48)',
+                badgeBg: '#475569',
+                furLight: '#cbd5e1',
+                furMain: '#94a3b8',
+                furDark: '#475569',
+                outlineCol: '#334155',
+                creamLight: '#f8fafc',
+                creamDark: '#e2e8f0',
+                padCol: '#334155',
+                blushCol: 'rgba(148, 163, 184, 0.5)',
+                accessory: 'dizzy',
+                name: 'Sleepy Decoy Teddy'
+            },
+            // +5 PTS CLASSIC HONEY TEDDY (Exact color palette from the reference image!)
+            {
+                tier: 'COMMON',
+                tierLabel: 'Classic Honey Teddy',
+                points: 5,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#4ade80',
+                auraGlow: 'rgba(74, 222, 128, 0.55)',
+                badgeBg: '#16a34a',
+                furLight: '#f6ba6f',
+                furMain: '#d97b29',
+                furDark: '#8c3f0b',
+                outlineCol: '#5c2604',
+                creamLight: '#fff8e7',
+                creamDark: '#f3d5a5',
+                padCol: '#602606',
+                blushCol: 'rgba(244, 114, 114, 0.72)',
+                accessory: 'none',
+                name: 'Classic Honey Teddy'
+            },
+            // +15 PTS STRAWBERRY PINK TEDDY
+            {
+                tier: 'COMMON',
+                tierLabel: 'Sweet Teddy',
+                points: 15,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#34d399',
+                auraGlow: 'rgba(52, 211, 153, 0.58)',
+                badgeBg: '#059669',
+                furLight: '#fbcfe8',
+                furMain: '#ec4899',
+                furDark: '#9d174d',
+                outlineCol: '#701a3c',
+                creamLight: '#fff1f2',
+                creamDark: '#fecdd3',
+                padCol: '#881337',
+                blushCol: 'rgba(251, 113, 133, 0.8)',
+                accessory: 'bow',
+                name: 'Strawberry Teddy'
+            },
+            // +25 PTS SKY FROST TEDDY
+            {
+                tier: 'RARE',
+                tierLabel: 'Rare Teddy',
+                points: 25,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#38bdf8',
+                auraGlow: 'rgba(56, 189, 248, 0.65)',
+                badgeBg: '#0284c7',
+                furLight: '#bae6fd',
+                furMain: '#38bdf8',
+                furDark: '#0369a1',
+                outlineCol: '#0c4a6e',
+                creamLight: '#f0f9ff',
+                creamDark: '#e0f2fe',
+                padCol: '#075985',
+                blushCol: 'rgba(244, 114, 182, 0.7)',
+                accessory: 'none',
+                name: 'Sky Berry Teddy'
+            },
+            // +40 PTS CARAMEL PANDA TEDDY
+            {
+                tier: 'RARE',
+                tierLabel: 'Super Rare Teddy',
+                points: 40,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#60a5fa',
+                auraGlow: 'rgba(96, 165, 250, 0.68)',
+                badgeBg: '#1d4ed8',
+                furLight: '#fde68a',
+                furMain: '#d97706',
+                furDark: '#78350f',
+                outlineCol: '#451a03',
+                creamLight: '#fffbeb',
+                creamDark: '#fde68a',
+                padCol: '#451a03',
+                blushCol: 'rgba(248, 113, 113, 0.78)',
+                accessory: 'bow',
+                name: 'Caramel Hug Teddy'
+            },
+            // +60 PTS GALAXY LAVENDER TEDDY
+            {
+                tier: 'EPIC',
+                tierLabel: 'Epic Teddy',
+                points: 60,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#c084fc',
+                auraGlow: 'rgba(192, 132, 252, 0.75)',
+                badgeBg: '#7e22ce',
+                furLight: '#e9d5ff',
+                furMain: '#a855f7',
+                furDark: '#581c87',
+                outlineCol: '#3b0764',
+                creamLight: '#faf5ff',
+                creamDark: '#f3e8ff',
+                padCol: '#4c1d95',
+                blushCol: 'rgba(244, 114, 182, 0.78)',
+                accessory: 'star',
+                name: 'Galaxy Lavender Teddy'
+            },
+            // +100 PTS GOLDEN ROYAL TEDDY
+            {
+                tier: 'LEGENDARY',
+                tierLabel: 'Legendary Teddy',
+                points: 100,
+                isDecoy: false,
+                isMystery: false,
+                auraColor: '#facc15',
+                auraGlow: 'rgba(250, 204, 21, 0.88)',
+                badgeBg: '#b45309',
+                furLight: '#fef08a',
+                furMain: '#f59e0b',
+                furDark: '#92400e',
+                outlineCol: '#5c2604',
+                creamLight: '#fefce8',
+                creamDark: '#fef08a',
+                padCol: '#78350f',
+                blushCol: 'rgba(244, 63, 94, 0.78)',
+                accessory: 'crown',
+                name: 'Royal Golden Teddy'
+            },
+            // ? PTS MYSTERY SURPRISE TEDDY (Could be 0, 20, 50, or 80 PTS when answered!)
+            {
+                tier: 'MYSTERY',
+                tierLabel: 'Mystery Teddy',
+                points: 50,
+                isDecoy: false,
+                isMystery: true,
+                auraColor: '#f472b6',
+                auraGlow: 'rgba(244, 114, 182, 0.78)',
+                badgeBg: '#db2777',
+                furLight: '#fed7aa',
+                furMain: '#ea580c',
+                furDark: '#7c2d12',
+                outlineCol: '#431407',
+                creamLight: '#fff7ed',
+                creamDark: '#ffedd5',
+                padCol: '#5c2604',
+                blushCol: 'rgba(244, 114, 114, 0.76)',
+                accessory: 'crown',
+                name: 'Mystery Honey Teddy'
+            }
+        ];
+
+        let plushies = [];
+        let particles = [];
+        let bgStars = [];
+        let animTick = 0;
+
+        function initBgStars() {
+            bgStars = [];
+            for (let i = 0; i < 32; i++) {
+                bgStars.push({
+                    x: Math.random() * GAME_W,
+                    y: Math.random() * (GAME_H - 90),
+                    r: Math.random() * 2 + 1,
+                    phase: Math.random() * Math.PI * 2
+                });
             }
         }
 
-        function startPureVisionEngine(videoEl, canvasEl) {
-            const ctx = canvasEl.getContext('2d');
-            canvasEl.width = 160;
-            canvasEl.height = 120;
+        function initPlushies() {
+            plushies = [];
+            const poolTemplates = [];
 
-            function processFrame() {
-                if (!videoEl.videoWidth) {
-                    requestAnimationFrame(processFrame);
-                    return;
+            // Add configured number of 0-Point Decoy Teddy Bears
+            for (let d = 0; d < decoyCountSetting; d++) {
+                poolTemplates.push(TEDDY_CATALOG[0]);
+            }
+
+            // Fill remaining slots (up to 10 bears total) with diverse point tiers (+5, +15, +25, +40, +60, +100, ? PTS)
+            const rewardTemplates = [
+                TEDDY_CATALOG[1], // +5 PTS Classic Honey Teddy
+                TEDDY_CATALOG[1], // +5 PTS Classic Honey Teddy
+                TEDDY_CATALOG[2], // +15 PTS Strawberry Teddy
+                TEDDY_CATALOG[3], // +25 PTS Sky Berry Teddy
+                TEDDY_CATALOG[4], // +40 PTS Caramel Hug Teddy
+                TEDDY_CATALOG[5], // +60 PTS Galaxy Lavender Teddy
+                TEDDY_CATALOG[6], // +100 PTS Royal Golden Teddy
+                TEDDY_CATALOG[7]  // ? PTS Mystery Honey Teddy
+            ];
+
+            let idx = 0;
+            while (poolTemplates.length < 10) {
+                poolTemplates.push(rewardTemplates[idx % rewardTemplates.length]);
+                idx++;
+            }
+
+            // Shuffle positions so 0-PTS Decoys mix naturally with high-point Teddies
+            poolTemplates.sort(() => Math.random() - 0.5);
+
+            const startX = 174;
+            const endX = 548;
+
+            for (let i = 0; i < poolTemplates.length; i++) {
+                const template = poolTemplates[i];
+                const row = i < 5 ? 0 : 1;
+                const colIdx = row === 0 ? i : i - 5;
+                const spacing = (endX - startX) / 4.15;
+
+                const px = startX + colIdx * spacing + (row === 1 ? 20 : -10) + (Math.random() * 12 - 6);
+                const py = row === 0 ? 390 : 340;
+
+                // Randomize Mystery Bear actual reward (can even be a 0 PTS trap or big jackpot!)
+                let actualPoints = template.points;
+                if (template.isMystery) {
+                    const mysteryOutcomes = [0, 15, 35, 50, 80, 100];
+                    actualPoints = mysteryOutcomes[Math.floor(Math.random() * mysteryOutcomes.length)];
                 }
 
-                ctx.drawImage(videoEl, 0, 0, 160, 120);
-                const frame = ctx.getImageData(0, 0, 160, 120);
-                const data = frame.data;
+                const auraOrbs = [];
+                const orbCount = actualPoints >= 60 ? 5 : (actualPoints === 0 ? 2 : 3);
+                for (let k = 0; k < orbCount; k++) {
+                    auraOrbs.push({
+                        angle: (Math.PI * 2 * k) / orbCount,
+                        speed: 0.028 + Math.random() * 0.02,
+                        dist: 34 + Math.random() * 4
+                    });
+                }
 
-                let skinPixelsX = 0;
-                let skinPixelsY = 0;
-                let skinCount = 0;
-                let topY = 120;
-                let topX = 80;
+                plushies.push({
+                    id: Date.now() + i,
+                    ...template,
+                    points: actualPoints,
+                    x: Math.min(Math.max(px, 170), 550),
+                    y: py,
+                    vx: 0,
+                    vy: 0,
+                    radius: 30,
+                    rotation: (Math.random() - 0.5) * 0.14,
+                    phase: Math.random() * Math.PI * 2,
+                    auraOrbs,
+                    state: 'FLOOR'
+                });
+            }
+        }
 
-                // Thuật toán nhận diện phổ màu da người thực tế
-                for (let i = 0; i < data.length; i += 16) {
-                    const r = data[i], g = data[i + 1], b = data[i + 2];
-                    if (r > 90 && g > 40 && b > 20 && (r - g) > 15 && r > b) {
-                        const pxIdx = i / 4;
-                        const x = pxIdx % 160;
-                        const y = Math.floor(pxIdx / 160);
-                        skinPixelsX += x;
-                        skinPixelsY += y;
-                        skinCount++;
+        function resetPlushPool() {
+            if (claw.state !== 'IDLE') return;
+            initPlushies();
+            showMachineToast("Respawned fresh 3D Hugging Teddy Bears! 🧸✨");
+            playSoundEffect('grab');
+        }
 
-                        if (y < topY) {
-                            topY = y;
-                            topX = x;
+        /**
+         * EXACT 3D SITTING HUGGING TEDDY BEAR RENDERER (Matches the uploaded reference image!)
+         * Features:
+         * - Round ears with warm cream inner ear pads
+         * - Cute 3-tuft hair crest on top of the head
+         * - Happy curved crescent smiling eyes (^ ^), eyebrows, rosy cheeks
+         * - Cream oval muzzle, glossy brown oval nose, open laughing mouth with pink tongue
+         * - Plump pear-shaped sitting body with a cream oval belly patch
+         * - Outstretched hugging arms with thumb, dark brown palm pad & 4 tiny toe beans
+         * - Two sitting feet facing forward with dark brown oval sole pads
+         */
+        function drawSittingHuggingTeddy3D(targetCtx, bear, x, y, scale = 1, showBadge = true) {
+            targetCtx.save();
+            targetCtx.translate(x, y);
+            targetCtx.scale(scale, scale);
+
+            const isGrabbed = bear.state === 'GRABBED';
+            const breathe = Math.sin(animTick * 0.075 + bear.phase) * 2.0;
+            const armWave = isGrabbed
+                ? Math.sin(animTick * 0.35) * 0.24
+                : Math.sin(animTick * 0.08 + bear.phase) * 0.07;
+
+            // 1. MAGICAL 3D AURA GLOW BEHIND THE TEDDY BEAR
+            const auraPulse = 1 + Math.sin(animTick * 0.09 + bear.phase) * 0.11;
+            const auraRadius = 42 * auraPulse;
+
+            const auraGrad = targetCtx.createRadialGradient(0, breathe - 2, 8, 0, breathe - 2, auraRadius);
+            auraGrad.addColorStop(0, bear.auraGlow);
+            auraGrad.addColorStop(0.65, bear.auraGlow.replace(/[\d.]+\)$/g, '0.2)'));
+            auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
+
+            targetCtx.fillStyle = auraGrad;
+            targetCtx.beginPath();
+            targetCtx.arc(0, breathe - 2, auraRadius, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Rotating magic ring
+            targetCtx.save();
+            targetCtx.translate(0, breathe - 2);
+            targetCtx.rotate(animTick * 0.025 + bear.phase);
+            targetCtx.strokeStyle = bear.auraColor;
+            targetCtx.lineWidth = bear.points >= 60 ? 2.4 : 1.6;
+            targetCtx.setLineDash(bear.points === 0 ? [3, 6] : [7, 5]);
+            targetCtx.beginPath();
+            targetCtx.arc(0, 0, 34, 0, Math.PI * 2);
+            targetCtx.stroke();
+            targetCtx.setLineDash([]);
+            targetCtx.restore();
+
+            // Orbiting Aura Sparkles
+            if (bear.auraOrbs) {
+                for (let orb of bear.auraOrbs) {
+                    orb.angle += orb.speed;
+                    const ox = Math.cos(orb.angle) * orb.dist;
+                    const oy = (breathe - 2) + Math.sin(orb.angle) * (orb.dist * 0.78);
+                    targetCtx.fillStyle = bear.points === 0 ? '#94a3b8' : '#ffffff';
+                    targetCtx.beginPath();
+                    targetCtx.arc(ox, oy, bear.points >= 60 ? 2.8 : 2.1, 0, Math.PI * 2);
+                    targetCtx.fill();
+                }
+            }
+
+            // 2. SOFT GROUND SHADOW
+            targetCtx.fillStyle = "rgba(15, 23, 42, 0.35)";
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, 27, 25, 6.5, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Apply Teddy breathing & gentle tilt
+            targetCtx.save();
+            targetCtx.translate(0, breathe);
+            targetCtx.rotate(bear.rotation || 0);
+
+            // Helper for 3D shaded rounded shapes with warm fur outline
+            function makeFurGrad(cx, cy, r) {
+                const g = targetCtx.createRadialGradient(cx - r * 0.28, cy - r * 0.32, r * 0.08, cx, cy, r * 1.15);
+                g.addColorStop(0, bear.furLight);
+                g.addColorStop(0.52, bear.furMain);
+                g.addColorStop(1, bear.furDark);
+                return g;
+            }
+
+            function makeCreamGrad(cx, cy, r) {
+                const g = targetCtx.createRadialGradient(cx - r * 0.2, cy - r * 0.25, r * 0.1, cx, cy, r);
+                g.addColorStop(0, bear.creamLight);
+                g.addColorStop(1, bear.creamDark);
+                return g;
+            }
+
+            targetCtx.strokeStyle = bear.outlineCol;
+            targetCtx.lineWidth = 1.4;
+            targetCtx.lineJoin = "round";
+            targetCtx.lineCap = "round";
+
+            // =========================================================================
+            // A. OUTSTRETCHED HUGGING ARMS (Left & Right with thumb, palm pad & 4 toe beans)
+            // =========================================================================
+            [-1, 1].forEach(dir => {
+                targetCtx.save();
+                targetCtx.scale(dir, 1);
+                targetCtx.translate(13, 3);
+                targetCtx.rotate(-0.32 + (dir === 1 ? armWave : -armWave));
+
+                // Main outstretched arm & rounded paw
+                targetCtx.fillStyle = makeFurGrad(10, 0, 14);
+                targetCtx.beginPath();
+                targetCtx.moveTo(-2, -5.5);
+                targetCtx.quadraticCurveTo(6, -6.5, 10, -8.5);
+                // Little upward thumb bump on top edge of paw (just like the picture!)
+                targetCtx.quadraticCurveTo(12.2, -12.5, 14.8, -9.2);
+                targetCtx.quadraticCurveTo(16.2, -7.5, 18.5, -6.8);
+                // Rounded outer paw tip
+                targetCtx.bezierCurveTo(25.5, -5.5, 25.5, 6.5, 17.5, 6.8);
+                targetCtx.quadraticCurveTo(8, 7.2, -2, 5.2);
+                targetCtx.closePath();
+                targetCtx.fill();
+                targetCtx.stroke();
+
+                // Dark brown oval central palm pad
+                targetCtx.fillStyle = bear.padCol;
+                targetCtx.beginPath();
+                targetCtx.ellipse(15.2, 0.4, 3.6, 4.2, 0.12, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                // 4 tiny round toe beans curving around the outer edge of the paw
+                const beanCoords = [
+                    [19.2, -3.6],
+                    [21.0, -1.2],
+                    [20.8, 1.5],
+                    [18.9, 3.8]
+                ];
+                for (const [bx, by] of beanCoords) {
+                    targetCtx.beginPath();
+                    targetCtx.arc(bx, by, 1.15, 0, Math.PI * 2);
+                    targetCtx.fill();
+                }
+
+                targetCtx.restore();
+            });
+
+            // =========================================================================
+            // B. PLUMP PEAR-SHAPED SITTING TORSO & CREAM BELLY PATCH
+            // =========================================================================
+            targetCtx.fillStyle = makeFurGrad(0, 11, 18);
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, 12.5, 15.2, 13.8, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Soft Cream Oval Belly Patch
+            targetCtx.fillStyle = makeCreamGrad(0, 12.5, 11);
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, 13, 9.6, 9.0, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // =========================================================================
+            // C. TWO SITTING LEGS & FORWARD-FACING OVAL FEET SOLES WITH DARK PADS
+            // =========================================================================
+            [-1, 1].forEach(dir => {
+                targetCtx.save();
+                targetCtx.scale(dir, 1);
+
+                // Outer foot sole oval angled outward
+                targetCtx.fillStyle = makeFurGrad(12, 20, 11);
+                targetCtx.beginPath();
+                targetCtx.ellipse(12.5, 20.5, 8.2, 10.2, -0.42, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.stroke();
+
+                // Rim highlight on top of foot
+                targetCtx.fillStyle = "rgba(255,255,255,0.28)";
+                targetCtx.beginPath();
+                targetCtx.ellipse(10.5, 13.5, 3.2, 1.3, -0.3, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                // Dark brown inner foot pad oval
+                targetCtx.fillStyle = bear.padCol;
+                targetCtx.beginPath();
+                targetCtx.ellipse(12.8, 21.3, 5.0, 6.6, -0.42, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                targetCtx.restore();
+            });
+
+            // =========================================================================
+            // D. ROUND EARS ON TOP CORNERS WITH WARM CREAM INNER PADS
+            // =========================================================================
+            [-1, 1].forEach(dir => {
+                targetCtx.save();
+                targetCtx.scale(dir, 1);
+
+                // Outer ear
+                targetCtx.fillStyle = makeFurGrad(15.5, -18.5, 9.5);
+                targetCtx.beginPath();
+                targetCtx.arc(15.5, -18.5, 8.6, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.stroke();
+
+                // Cream inner ear cushion
+                targetCtx.fillStyle = makeCreamGrad(15.2, -18.2, 5.5);
+                targetCtx.beginPath();
+                targetCtx.arc(15.2, -18.2, 4.9, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                targetCtx.restore();
+            });
+
+            // =========================================================================
+            // E. LARGE ROUNDED TEDDY HEAD & 3-TUFT HAIR CREST ON TOP
+            // =========================================================================
+            targetCtx.fillStyle = makeFurGrad(0, -8.5, 21);
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, -8.5, 19.2, 16.4, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Cute 3-tuft fur crest on top center of head (exact detail from reference image!)
+            targetCtx.fillStyle = bear.furLight;
+            targetCtx.beginPath();
+            targetCtx.moveTo(-3.5, -24.0);
+            targetCtx.quadraticCurveTo(-4.5, -28.2, -1.2, -25.2);
+            targetCtx.quadraticCurveTo(0.2, -29.2, 1.8, -25.2);
+            targetCtx.quadraticCurveTo(4.8, -28.0, 3.6, -23.8);
+            targetCtx.closePath();
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Soft 3D forehead shine highlight
+            targetCtx.fillStyle = "rgba(255, 255, 255, 0.30)";
+            targetCtx.beginPath();
+            targetCtx.ellipse(-6.5, -18.2, 6.5, 2.6, -0.3, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // =========================================================================
+            // F. FACIAL FEATURES: EYEBROWS, HAPPY CRESCENT EYES (^ ^), BLUSH, MUZZLE & OPEN SMILE
+            // =========================================================================
+            // Cute curved eyebrows
+            targetCtx.strokeStyle = bear.padCol;
+            targetCtx.lineWidth = 1.7;
+            targetCtx.beginPath();
+            targetCtx.arc(-7.5, -15.5, 3.2, Math.PI * 1.18, Math.PI * 1.78);
+            targetCtx.stroke();
+            targetCtx.beginPath();
+            targetCtx.arc(7.5, -15.5, 3.2, Math.PI * 1.22, Math.PI * 1.82);
+            targetCtx.stroke();
+
+            // Happy upward-curved crescent smiling eyes (^ ^) just like the reference image!
+            targetCtx.strokeStyle = "#3e1603";
+            targetCtx.lineWidth = 2.5;
+            targetCtx.lineCap = "round";
+            targetCtx.beginPath();
+            targetCtx.arc(-8.2, -9.2, 4.1, Math.PI * 1.12, Math.PI * 1.88);
+            targetCtx.stroke();
+            targetCtx.beginPath();
+            targetCtx.arc(8.2, -9.2, 4.1, Math.PI * 1.12, Math.PI * 1.88);
+            targetCtx.stroke();
+
+            // Rosy Pink Oval Cheek Blushes
+            targetCtx.fillStyle = bear.blushCol;
+            targetCtx.beginPath();
+            targetCtx.ellipse(-12.2, -4.8, 3.9, 2.2, 0, 0, Math.PI * 2);
+            targetCtx.ellipse(12.2, -4.8, 3.9, 2.2, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Large Cream Oval Muzzle Patch
+            targetCtx.fillStyle = makeCreamGrad(0, -3.5, 8.5);
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, -3.2, 7.6, 6.4, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Glossy Dark Brown Oval Nose with White Highlight
+            targetCtx.fillStyle = "#4a1c04";
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, -6.2, 3.4, 2.3, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            targetCtx.fillStyle = "rgba(255, 255, 255, 0.75)";
+            targetCtx.beginPath();
+            targetCtx.ellipse(-1.1, -6.9, 1.1, 0.6, -0.2, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Cheerful Open Laughing Mouth with Cute Pink Tongue Inside!
+            // Upper smile lip curve
+            targetCtx.strokeStyle = "#4a1c04";
+            targetCtx.lineWidth = 1.5;
+            targetCtx.beginPath();
+            targetCtx.moveTo(-3.8, -3.6);
+            targetCtx.quadraticCurveTo(0, -2.0, 3.8, -3.6);
+            targetCtx.stroke();
+
+            // Open mouth cavity
+            targetCtx.fillStyle = "#7f1d1d";
+            targetCtx.beginPath();
+            targetCtx.moveTo(-3.1, -3.3);
+            targetCtx.quadraticCurveTo(0, -2.2, 3.1, -3.3);
+            targetCtx.quadraticCurveTo(2.9, 1.8, 0, 1.9);
+            targetCtx.quadraticCurveTo(-2.9, 1.8, -3.1, -3.3);
+            targetCtx.closePath();
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Pink/Coral Tongue inside open mouth
+            targetCtx.fillStyle = "#fb7185";
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, 0.2, 2.1, 1.45, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // =========================================================================
+            // G. OPTIONAL ROYAL CROWN / BOW / STAR FOR HIGHER POINT TIERS
+            // =========================================================================
+            if (bear.accessory === 'crown') {
+                targetCtx.fillStyle = "#facc15";
+                targetCtx.strokeStyle = "#b45309";
+                targetCtx.lineWidth = 1.3;
+                targetCtx.beginPath();
+                targetCtx.moveTo(-7.5, -24.5);
+                targetCtx.lineTo(-9.5, -32.5);
+                targetCtx.lineTo(-3.5, -27.5);
+                targetCtx.lineTo(0, -34.5);
+                targetCtx.lineTo(3.5, -27.5);
+                targetCtx.lineTo(9.5, -32.5);
+                targetCtx.lineTo(7.5, -24.5);
+                targetCtx.closePath();
+                targetCtx.fill();
+                targetCtx.stroke();
+            } else if (bear.accessory === 'bow') {
+                targetCtx.fillStyle = "#f43f5e";
+                targetCtx.strokeStyle = "#881337";
+                targetCtx.lineWidth = 1.1;
+                targetCtx.beginPath();
+                targetCtx.moveTo(0, 3.2);
+                targetCtx.lineTo(-5.8, 0.2);
+                targetCtx.lineTo(-5.8, 6.2);
+                targetCtx.closePath();
+                targetCtx.moveTo(0, 3.2);
+                targetCtx.lineTo(5.8, 0.2);
+                targetCtx.lineTo(5.8, 6.2);
+                targetCtx.closePath();
+                targetCtx.fill();
+                targetCtx.stroke();
+                targetCtx.beginPath();
+                targetCtx.arc(0, 3.2, 2.0, 0, Math.PI * 2);
+                targetCtx.fill();
+            } else if (bear.accessory === 'star') {
+                targetCtx.fillStyle = "#fde047";
+                targetCtx.beginPath();
+                targetCtx.arc(0, -29, 4, 0, Math.PI * 2);
+                targetCtx.fill();
+            }
+
+            targetCtx.restore();
+
+            // =========================================================================
+            // H. POINT TIER BADGE BELOW TEDDY BEAR (0 PTS, +5 PTS, +15 PTS, ... ? PTS)
+            // =========================================================================
+            if (showBadge) {
+                targetCtx.save();
+                targetCtx.translate(0, 30);
+
+                const hideZeroAsMystery = bear.isDecoy && disguiseDecoysAsMystery;
+                const displayMystery = bear.isMystery || hideZeroAsMystery;
+                const labelText = displayMystery ? "? PTS" : `${bear.points === 0 ? '0' : '+' + bear.points} PTS`;
+
+                targetCtx.fillStyle = displayMystery ? '#db2777' : bear.badgeBg;
+                targetCtx.strokeStyle = "#ffffff";
+                targetCtx.lineWidth = 2;
+                targetCtx.beginPath();
+                targetCtx.roundRect(-25, -8, 50, 16, 8);
+                targetCtx.fill();
+                targetCtx.stroke();
+
+                targetCtx.fillStyle = "#ffffff";
+                targetCtx.font = "800 10.5px 'Baloo 2', sans-serif";
+                targetCtx.textAlign = "center";
+                targetCtx.textBaseline = "middle";
+                targetCtx.fillText(labelText, 0, 0.5);
+                targetCtx.restore();
+            }
+
+            targetCtx.restore();
+        }
+
+        // Toast Helper
+        let toastTimeout = null;
+        function showMachineToast(msg) {
+            const toast = document.getElementById('machineToast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0', 'scale-90');
+            toast.classList.add('opacity-100', 'scale-100');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'scale-100');
+                toast.classList.add('opacity-0', 'scale-90');
+            }, 2600);
+        }
+
+        function spawnConfetti(x, y) {
+            const colors = ['#f472b6', '#facc15', '#4ade80', '#38bdf8', '#c084fc'];
+            for (let i = 0; i < 36; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: -Math.random() * 9 - 2,
+                    size: Math.random() * 6 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1
+                });
+            }
+        }
+
+        function triggerClawDrop() {
+            if (claw.state !== 'IDLE') return;
+            claw.state = 'DROPPING';
+            claw.prongAngle = 0.52;
+            playSoundEffect('drop');
+            showMachineToast("Dropping the claw... 🎯");
+        }
+
+        function updateGamePhysics() {
+            animTick++;
+
+            if (claw.state === 'IDLE') {
+                let activeDir = claw.moveDir !== 0 ? claw.moveDir : aiHandDirection;
+                if (activeDir !== 0) {
+                    claw.x += activeDir * claw.speedX;
+                    if (claw.x < claw.minX) claw.x = claw.minX;
+                    if (claw.x > claw.maxX) claw.x = claw.maxX;
+                }
+            } else if (claw.state === 'DROPPING') {
+                claw.y += claw.speedY;
+
+                let hitPlush = null;
+                let minDist = 999;
+
+                for (let p of plushies) {
+                    if (p.state !== 'FLOOR') continue;
+                    const dx = p.x - claw.x;
+                    const dy = p.y - (claw.y + 30);
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < p.radius + 14 && Math.abs(dx) < 35) {
+                        if (dist < minDist) {
+                            minDist = dist;
+                            hitPlush = p;
                         }
                     }
                 }
 
-                if (skinCount > 70) {
-                    // 1. TÍNH TOÁN VỊ TRÍ X ĐỂ DI CHUYỂN CÀNG GẮP
-                    const avgX = (skinPixelsX / skinCount) / 160;
-                    const avgY = (skinPixelsY / skinCount);
-                    const cabinetW = document.getElementById('machineCabinet').clientWidth;
-                    const targetX = 145 + (1.0 - avgX) * (cabinetW - 185);
-                    
-                    // Di chuyển mượt mà (Smoothing)
-                    clawX = clawX * 0.72 + targetX * 0.28;
-                    renderClawX();
-
-                    const coordEl = document.getElementById('handCoordText');
-                    if (avgX < 0.4) coordEl.innerText = "Vị trí: Phải ➡️";
-                    else if (avgX > 0.6) coordEl.innerText = "Vị trí: Trái ⬅️";
-                    else coordEl.innerText = "Vị trí: Giữa ⏺️";
-
-                    // 2. TÍNH TOÁN CỬ CHỈ GIƠ NGÓN CÁI (THUMBS UP)
-                    // Khoảng cách nhô cao từ đỉnh ngón cái (topY) so với trọng tâm bàn tay (avgY)
-                    const protrusion = avgY - topY; // Càng vươn ngón cái lên cao, protrusion càng lớn
-                    const thumbScore = Math.min(100, Math.max(0, (protrusion - 18) * 4.5));
-                    updateThumbHUD(thumbScore);
-
-                    if (thumbScore >= 55) {
-                        document.getElementById('gestureText').innerHTML = '<span class="text-emerald-400 font-black">👍 ĐÃ NHẬN: GẮP!</span>';
-                        triggerThumbsUpGrab();
+                if (hitPlush) {
+                    claw.grabbedPlush = hitPlush;
+                    hitPlush.state = 'GRABBED';
+                    claw.state = 'GRABBING';
+                    playSoundEffect('grab');
+                } else if (claw.y >= claw.maxY) {
+                    claw.y = claw.maxY;
+                    claw.state = 'GRABBING';
+                    playSoundEffect('miss');
+                }
+            } else if (claw.state === 'GRABBING') {
+                claw.prongAngle -= 0.04;
+                if (claw.prongAngle <= 0.14) {
+                    claw.prongAngle = 0.14;
+                    claw.state = 'RISING';
+                    if (claw.grabbedPlush) {
+                        const badgeInfo = claw.grabbedPlush.isMystery ? '? PTS' : `${claw.grabbedPlush.points} PTS`;
+                        showMachineToast(`Grabbed ${claw.grabbedPlush.name} (${badgeInfo})! 🌟`);
                     } else {
-                        document.getElementById('gestureText').innerHTML = '<span class="text-cyan-300">🖐️ Lướt tay (Giơ 👍 để gắp)</span>';
+                        showMachineToast("Missed! Try aiming right over a teddy bear! 💪");
                     }
-                } else {
-                    document.getElementById('gestureText').innerText = "🔍 Đang tìm bàn tay...";
-                    updateThumbHUD(0);
+                }
+            } else if (claw.state === 'RISING') {
+                claw.y -= claw.speedY * 0.86;
+                if (claw.grabbedPlush) {
+                    claw.grabbedPlush.x = claw.x;
+                    claw.grabbedPlush.y = claw.y + 38;
+                    claw.grabbedPlush.rotation = Math.sin(claw.y * 0.09) * 0.15;
                 }
 
-                requestAnimationFrame(processFrame);
+                if (claw.y <= claw.baseY) {
+                    claw.y = claw.baseY;
+                    if (claw.grabbedPlush) {
+                        claw.state = 'QUIZ';
+                        openQuizModal(claw.grabbedPlush);
+                    } else {
+                        claw.prongAngle = 0.46;
+                        claw.state = 'IDLE';
+                        if (gameMode === '2TEAMS') {
+                            switchTeamTurn();
+                        }
+                    }
+                }
+            } else if (claw.state === 'MOVING_TO_CHUTE') {
+                if (claw.x > CHUTE.dropTargetX) {
+                    claw.x -= claw.speedX * 1.15;
+                    if (claw.grabbedPlush) {
+                        claw.grabbedPlush.x = claw.x;
+                        claw.grabbedPlush.y = claw.y + 38;
+                    }
+                } else {
+                    claw.x = CHUTE.dropTargetX;
+                    claw.state = 'RELEASING';
+                }
+            } else if (claw.state === 'RELEASING') {
+                claw.prongAngle = 0.52;
+                if (claw.grabbedPlush) {
+                    claw.grabbedPlush.state = 'FALLING_CHUTE';
+                    claw.grabbedPlush.vy = 2.2;
+                    claw.grabbedPlush = null;
+                }
+                claw.state = 'RETURNING';
+            } else if (claw.state === 'DROPPING_FAIL') {
+                claw.prongAngle = 0.52;
+                if (claw.grabbedPlush) {
+                    claw.grabbedPlush.state = 'FALLING_FLOOR';
+                    claw.grabbedPlush.vy = 2.2;
+                    claw.grabbedPlush = null;
+                }
+                claw.state = 'IDLE';
+                if (gameMode === '2TEAMS') {
+                    switchTeamTurn();
+                }
+            } else if (claw.state === 'RETURNING') {
+                if (claw.x < 270) {
+                    claw.x += claw.speedX;
+                } else {
+                    claw.prongAngle = 0.46;
+                    claw.state = 'IDLE';
+                    if (gameMode === '2TEAMS') {
+                        switchTeamTurn();
+                    }
+                }
             }
-            processFrame();
+
+            // Update falling physics for teddy bears
+            for (let i = plushies.length - 1; i >= 0; i--) {
+                const p = plushies[i];
+                if (p.state === 'FALLING_CHUTE') {
+                    p.vy += 0.45;
+                    p.y += p.vy;
+                    p.rotation += 0.06;
+
+                    if (p.y >= CHUTE.y + 52) {
+                        spawnConfetti(CHUTE.x + CHUTE.width / 2, CHUTE.y + 18);
+                        collectPrize(p);
+                        plushies.splice(i, 1);
+
+                        if (plushies.length === 0) {
+                            setTimeout(initPlushies, 1200);
+                        }
+                    }
+                } else if (p.state === 'FALLING_FLOOR') {
+                    p.vy += 0.5;
+                    p.y += p.vy;
+                    if (p.y >= 388) {
+                        p.y = 388;
+                        p.vy = 0;
+                        p.rotation = 0;
+                        p.state = 'FLOOR';
+                    }
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.vy += 0.24;
+                pt.alpha -= 0.02;
+                if (pt.alpha <= 0) particles.splice(i, 1);
+            }
         }
 
-        async function initCamera() {
-            const videoElement = document.getElementById('webcam');
-            const canvasElement = document.getElementById('output_canvas');
-            const badge = document.getElementById('aiEngineBadge');
+        function drawClawMachine() {
+            ctx.clearRect(0, 0, GAME_W, GAME_H);
+
+            // 1. Twinkling Starry Background
+            for (let st of bgStars) {
+                const alpha = 0.35 + Math.sin(animTick * 0.05 + st.phase) * 0.3;
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 2. Top Metallic Rail
+            ctx.fillStyle = "#e2e8f0";
+            ctx.fillRect(0, 12, GAME_W, 14);
+            ctx.fillStyle = "#94a3b8";
+            ctx.fillRect(0, 22, GAME_W, 4);
+
+            // 3. Plush Machine Floor
+            const floorGrad = ctx.createLinearGradient(0, 412, 0, GAME_H);
+            floorGrad.addColorStop(0, "#f472b6");
+            floorGrad.addColorStop(1, "#9d174d");
+            ctx.fillStyle = floorGrad;
+            ctx.fillRect(0, 415, GAME_W, 35);
+
+            // 4. Draw All Sitting Hugging 3D Teddy Bears
+            for (let p of plushies) {
+                if (p.state !== 'GRABBED') {
+                    drawSittingHuggingTeddy3D(ctx, p, p.x, p.y, 1, true);
+                }
+            }
+
+            // 5. Draw Claw & Grabbed Teddy Bear
+            drawClawMechanism();
+
+            if (claw.grabbedPlush) {
+                drawSittingHuggingTeddy3D(ctx, claw.grabbedPlush, claw.grabbedPlush.x, claw.grabbedPlush.y, 1.05, true);
+            }
+
+            // 6. Draw Prize Chute
+            drawPrizeChute();
+
+            // 7. Confetti Particles
+            for (let pt of particles) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, pt.alpha);
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawClawMechanism() {
+            ctx.save();
+
+            // Aiming Laser Guide when IDLE
+            if (claw.state === 'IDLE') {
+                ctx.strokeStyle = "rgba(250, 204, 21, 0.45)";
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(claw.x, claw.y + 42);
+                ctx.lineTo(claw.x, 385);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // Top Motor Carriage
+            ctx.fillStyle = "#f43f5e";
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.roundRect(claw.x - 24, 5, 48, 25, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Steel Cable
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(claw.x, 30);
+            ctx.lineTo(claw.x, claw.y);
+            ctx.stroke();
+
+            ctx.translate(claw.x, claw.y);
+
+            // Left Prong
+            ctx.save();
+            ctx.rotate(claw.prongAngle);
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            ctx.moveTo(-6, 0);
+            ctx.lineTo(-28, 22);
+            ctx.lineTo(-14, 46);
+            ctx.stroke();
+            ctx.restore();
+
+            // Right Prong
+            ctx.save();
+            ctx.rotate(-claw.prongAngle);
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            ctx.moveTo(6, 0);
+            ctx.lineTo(28, 22);
+            ctx.lineTo(14, 46);
+            ctx.stroke();
+            ctx.restore();
+
+            // Golden Hub Joint
+            ctx.fillStyle = "#facc15";
+            ctx.strokeStyle = "#b45309";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawPrizeChute() {
+            ctx.save();
+
+            const grad = ctx.createLinearGradient(CHUTE.x, CHUTE.y, CHUTE.x, CHUTE.y + CHUTE.height);
+            grad.addColorStop(0, "#ec4899");
+            grad.addColorStop(1, "#9d174d");
+
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.roundRect(CHUTE.x, CHUTE.y, CHUTE.width, CHUTE.height, [14, 14, 6, 6]);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#3b0764";
+            ctx.beginPath();
+            ctx.roundRect(CHUTE.x + 10, CHUTE.y + 10, CHUTE.width - 20, 42, 8);
+            ctx.fill();
+
+            ctx.fillStyle = "#fef08a";
+            ctx.font = "800 14px 'Baloo 2', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("🎁 PRIZE CHUTE", CHUTE.x + CHUTE.width / 2, CHUTE.y + 74);
+
+            ctx.fillStyle = "#fce7f3";
+            ctx.font = "700 11px 'Quicksand', sans-serif";
+            ctx.fillText("DROP ZONE", CHUTE.x + CHUTE.width / 2, CHUTE.y + 94);
+
+            ctx.restore();
+        }
+
+        /********************************************************************
+         * 5. QUIZ MODAL & DIVERSE POINT REWARD LOGIC
+         ********************************************************************/
+        let currentQuiz = null;
+
+        function openQuizModal(plush) {
+            currentQuiz = getNextQuestion();
+
+            // Render exact 3D Sitting Hugging Teddy preview in the Quiz Modal
+            const pCanvas = document.getElementById('quizBearPreviewCanvas');
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.clearRect(0, 0, 80, 80);
+            drawSittingHuggingTeddy3D(pCtx, plush, 40, 42, 0.92, false);
+
+            const hideZeroAsMystery = plush.isDecoy && disguiseDecoysAsMystery;
+            const isMysteryDisplay = plush.isMystery || hideZeroAsMystery;
+            const ptsLabel = isMysteryDisplay ? '? PTS' : `${plush.points === 0 ? '0' : '+' + plush.points} PTS`;
+
+            const rarityBadge = document.getElementById('quizRarityBadge');
+            rarityBadge.textContent = `✨ ${plush.tierLabel} (${ptsLabel})`;
+            rarityBadge.style.backgroundColor = isMysteryDisplay ? '#db2777' : plush.badgeBg;
+            rarityBadge.style.color = '#ffffff';
+
+            const teamBadge = document.getElementById('quizTurnTeamBadge');
+            if (gameMode === '2TEAMS') {
+                teamBadge.classList.remove('hidden');
+                teamBadge.textContent = currentTeamTurn === 'A' ? 'TEAM A' : 'TEAM B';
+                teamBadge.className = currentTeamTurn === 'A'
+                    ? "text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-rose-500 text-white"
+                    : "text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-sky-500 text-white";
+            } else {
+                teamBadge.classList.add('hidden');
+            }
+
+            document.getElementById('quizPlushName').textContent = `${plush.name} is on the claw!`;
+            document.getElementById('quizTopicBadge').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ${currentQuiz.topic || 'English Challenge'}`;
+            document.getElementById('quizPointsText').textContent = `🎁 Reward: ${ptsLabel}`;
+            document.getElementById('quizQuestionText').textContent = currentQuiz.question;
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            feedbackBox.classList.add('hidden');
+
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            currentQuiz.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-indigo-200 bg-white hover:bg-indigo-50 hover:border-indigo-400 text-slate-700 transition flex items-center justify-between shadow-sm text-sm sm:text-base";
+                btn.innerHTML = `<span>${optText}</span> <i class="fa-regular fa-circle text-indigo-300"></i>`;
+                btn.onclick = () => submitQuizAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            const modal = document.getElementById('quizModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function submitQuizAnswer(selectedIndex, clickedBtn) {
+            const buttons = document.getElementById('quizOptionsContainer').querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            feedbackBox.classList.remove('hidden');
+
+            const isCorrect = selectedIndex === Number(currentQuiz.correct);
+            const grabbed = claw.grabbedPlush;
+
+            if (isCorrect) {
+                playSoundEffect(grabbed && grabbed.points === 0 ? 'zero' : 'win');
+                clickedBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 text-emerald-900 flex items-center justify-between shadow-sm text-sm sm:text-base";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-600 text-lg";
+
+                const pts = grabbed ? grabbed.points : 10;
+                const extraNote = pts === 0
+                    ? `<br><span class="text-slate-600 font-bold">😅 Oh no! This was a 0-PTS Decoy Teddy Bear! Still, awesome English answer!</span>`
+                    : `<br><span class="text-amber-700 font-bold">🎁 Delivering ${grabbed.name} (+${pts} PTS) to the Prize Chute!</span>`;
+
+                feedbackBox.className = "rounded-2xl p-3.5 text-sm font-semibold mb-1 bg-emerald-50 border-2 border-emerald-300 text-emerald-800";
+                feedbackBox.innerHTML = `<b class="block text-emerald-700 mb-0.5 font-title text-base">🎉 Correct Answer!</b> ${currentQuiz.explanation || ''}${extraNote}`;
+
+                setTimeout(() => {
+                    closeQuizModal();
+                    showMachineToast("Correct! Carrying Teddy Bear to the Prize Chute! 🎁");
+                    claw.state = 'MOVING_TO_CHUTE';
+                }, 1550);
+            } else {
+                playSoundEffect('fail');
+                clickedBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-rose-500 bg-rose-100 text-rose-900 flex items-center justify-between shadow-sm text-sm sm:text-base";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-600 text-lg";
+
+                const rightBtn = buttons[currentQuiz.correct];
+                if (rightBtn) {
+                    rightBtn.className = "w-full text-left font-bold px-4 py-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 flex items-center justify-between text-sm sm:text-base";
+                }
+
+                feedbackBox.className = "rounded-2xl p-3.5 text-sm font-semibold mb-1 bg-rose-50 border-2 border-rose-300 text-rose-800";
+                feedbackBox.innerHTML = `<b class="block text-rose-700 mb-0.5 font-title text-base">💡 Oops! The teddy bear slipped!</b> ${currentQuiz.explanation || 'Remember the correct answer for next time!'}`;
+
+                setTimeout(() => {
+                    closeQuizModal();
+                    showMachineToast("Oops! The teddy bear slipped back into the machine! 💪");
+                    claw.state = 'DROPPING_FAIL';
+                }, 2100);
+            }
+        }
+
+        function closeQuizModal() {
+            const modal = document.getElementById('quizModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function collectPrize(plush) {
+            const pts = plush.points ?? 0;
+            playSoundEffect(pts === 0 ? 'zero' : 'win');
+
+            if (gameMode === '1P') {
+                score1P += pts;
+                count1P += 1;
+                document.getElementById('score1PDisplay').textContent = score1P;
+                document.getElementById('count1PDisplay').textContent = count1P;
+                if (pts === 0) {
+                    showMachineToast(`Caught ${plush.name}... It's a 0 PTS Decoy! 😅`);
+                } else {
+                    showMachineToast(`Collected ${plush.name} (+${pts} PTS)! 💖`);
+                }
+            } else {
+                if (currentTeamTurn === 'A') {
+                    scoreTeamA += pts;
+                    document.getElementById('scoreTeamADisplay').textContent = `${scoreTeamA} PTS`;
+                    showMachineToast(pts === 0 ? `Team A caught a 0 PTS Decoy Teddy! 😅` : `Team A earned +${pts} PTS from ${plush.name}! 🎉`);
+                } else {
+                    scoreTeamB += pts;
+                    document.getElementById('scoreTeamBDisplay').textContent = `${scoreTeamB} PTS`;
+                    showMachineToast(pts === 0 ? `Team B caught a 0 PTS Decoy Teddy! 😅` : `Team B earned +${pts} PTS from ${plush.name}! 🎉`);
+                }
+            }
+
+            // Add miniature 3D Sitting Teddy Bear Canvas to Collection Shelf
+            const grid = document.getElementById('collectionGrid');
+            const emptyText = document.getElementById('emptyCollectionText');
+            if (emptyText) emptyText.remove();
+
+            const item = document.createElement('div');
+            item.className = "flex items-center gap-2 bg-white border-2 px-2.5 py-1 rounded-2xl shadow-sm";
+            item.style.borderColor = plush.auraColor;
+
+            const miniCanvas = document.createElement('canvas');
+            miniCanvas.width = 36;
+            miniCanvas.height = 36;
+            miniCanvas.className = "w-8 h-8 shrink-0";
+            const mCtx = miniCanvas.getContext('2d');
+            drawSittingHuggingTeddy3D(mCtx, plush, 18, 19, 0.46, false);
+
+            const teamTag = gameMode === '2TEAMS'
+                ? `<span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full text-white ${currentTeamTurn === 'A' ? 'bg-rose-500' : 'bg-sky-500'}">Team ${currentTeamTurn}</span>`
+                : '';
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = "flex items-center gap-1.5";
+            metaDiv.innerHTML = `
+                <span class="text-xs font-title font-bold text-slate-700">${plush.name}</span>
+                <span class="text-[11px] font-extrabold ${pts === 0 ? 'text-slate-500' : 'text-amber-600'}">${pts === 0 ? '0 PTS' : '+' + pts + ' PTS'}</span>
+                ${teamTag}
+            `;
+
+            item.appendChild(miniCanvas);
+            item.appendChild(metaDiv);
+            grid.prepend(item);
+        }
+
+        /********************************************************************
+         * 6. TEACHER PANEL QUESTION MANAGER
+         ********************************************************************/
+        function openTeacherModal() {
+            renderTeacherQuestionList();
+            resetQuestionForm();
+            const modal = document.getElementById('teacherModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeTeacherModal() {
+            const modal = document.getElementById('teacherModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showTeacherNotice(text, isError = false) {
+            const notice = document.getElementById('teacherFormNotice');
+            notice.textContent = text;
+            notice.className = isError
+                ? "text-xs font-bold text-rose-600 mt-2 block"
+                : "text-xs font-bold text-emerald-600 mt-2 block";
+            setTimeout(() => notice.classList.add('hidden'), 3200);
+        }
+
+        function formatOptionLabel(idx, rawText) {
+            const letters = ['A', 'B', 'C', 'D'];
+            const clean = rawText.trim().replace(/^[A-Da-d][\.\)]\s*/, '');
+            return `${letters[idx]}. ${clean}`;
+        }
+
+        function saveSingleQuestion() {
+            const qText = document.getElementById('inpQuestion').value.trim();
+            const topic = document.getElementById('inpTopic').value.trim() || "Teacher Custom";
+            const optA = document.getElementById('inpOptA').value.trim();
+            const optB = document.getElementById('inpOptB').value.trim();
+            const optC = document.getElementById('inpOptC').value.trim();
+            const optD = document.getElementById('inpOptD').value.trim();
+            const correctIdx = parseInt(document.getElementById('inpCorrect').value, 10);
+            const explanation = document.getElementById('inpExplanation').value.trim();
+            const editIdx = parseInt(document.getElementById('editQuestionIndex').value, 10);
+
+            if (!qText || !optA || !optB || !optC || !optD) {
+                showTeacherNotice("⚠️ Please fill in the Question Prompt and all 4 options (A, B, C, D)!", true);
+                return;
+            }
+
+            const newQuestionObj = {
+                topic,
+                question: qText,
+                options: [
+                    formatOptionLabel(0, optA),
+                    formatOptionLabel(1, optB),
+                    formatOptionLabel(2, optC),
+                    formatOptionLabel(3, optD)
+                ],
+                correct: correctIdx,
+                explanation: explanation || `The correct answer is Option ${['A', 'B', 'C', 'D'][correctIdx]}.`
+            };
+
+            if (editIdx >= 0 && editIdx < questionBank.length) {
+                questionBank[editIdx] = newQuestionObj;
+                showTeacherNotice("✅ Question updated successfully!");
+            } else {
+                questionBank.unshift(newQuestionObj);
+                showTeacherNotice("✅ Added new question to the bank!");
+            }
+
+            saveQuestionsToStorage();
+            resetQuestionForm();
+            renderTeacherQuestionList();
+        }
+
+        function editQuestion(idx) {
+            const q = questionBank[idx];
+            if (!q) return;
+            document.getElementById('editQuestionIndex').value = idx;
+            document.getElementById('inpQuestion').value = q.question;
+            document.getElementById('inpTopic').value = q.topic || '';
+            document.getElementById('inpOptA').value = (q.options[0] || '').replace(/^[A-D]\.\s*/, '');
+            document.getElementById('inpOptB').value = (q.options[1] || '').replace(/^[A-D]\.\s*/, '');
+            document.getElementById('inpOptC').value = (q.options[2] || '').replace(/^[A-D]\.\s*/, '');
+            document.getElementById('inpOptD').value = (q.options[3] || '').replace(/^[A-D]\.\s*/, '');
+            document.getElementById('inpCorrect').value = q.correct;
+            document.getElementById('inpExplanation').value = q.explanation || '';
+
+            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Editing Question #${idx + 1}`;
+            document.getElementById('saveQuestionBtnText').textContent = "UPDATE QUESTION";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+
+        function deleteQuestion(idx) {
+            questionBank.splice(idx, 1);
+            saveQuestionsToStorage();
+            renderTeacherQuestionList();
+        }
+
+        function resetQuestionForm() {
+            document.getElementById('editQuestionIndex').value = "-1";
+            document.getElementById('inpQuestion').value = '';
+            document.getElementById('inpTopic').value = '';
+            document.getElementById('inpOptA').value = '';
+            document.getElementById('inpOptB').value = '';
+            document.getElementById('inpOptC').value = '';
+            document.getElementById('inpOptD').value = '';
+            document.getElementById('inpCorrect').value = '0';
+            document.getElementById('inpExplanation').value = '';
+            document.getElementById('formTitleText').innerHTML = `<i class="fa-solid fa-circle-plus text-indigo-600"></i> Add New Question`;
+            document.getElementById('saveQuestionBtnText').textContent = "SAVE QUESTION";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        function handleBulkImport() {
+            const raw = document.getElementById('bulkImportTextarea').value.trim();
+            if (!raw) return;
+            const lines = raw.split('\n');
+            let added = 0;
+
+            for (let line of lines) {
+                const parts = line.split('|').map(s => s.trim());
+                if (parts.length >= 6) {
+                    const [qText, a, b, c, d, ansLetter, exp] = parts;
+                    const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                    const correctIdx = letterMap[ansLetter.toUpperCase()] ?? 0;
+
+                    questionBank.unshift({
+                        topic: "Teacher Imported",
+                        question: qText,
+                        options: [
+                            formatOptionLabel(0, a),
+                            formatOptionLabel(1, b),
+                            formatOptionLabel(2, c),
+                            formatOptionLabel(3, d)
+                        ],
+                        correct: correctIdx,
+                        explanation: exp || `The correct answer is ${ansLetter.toUpperCase()}.`
+                    });
+                    added++;
+                }
+            }
+
+            if (added > 0) {
+                document.getElementById('bulkImportTextarea').value = '';
+                saveQuestionsToStorage();
+                renderTeacherQuestionList();
+                showTeacherNotice(`🎉 Successfully imported ${added} new question(s)!`);
+            } else {
+                showTeacherNotice("⚠️ Invalid format. Please separate columns with the pipe symbol |", true);
+            }
+        }
+
+        function restoreDefaultQuestions() {
+            questionBank = JSON.parse(JSON.stringify(defaultQuestionBank));
+            usedQuestionIndices = [];
+            saveQuestionsToStorage();
+            renderTeacherQuestionList();
+            showTeacherNotice("🔄 Restored the 12 default English questions!");
+        }
+
+        function clearAllQuestions() {
+            questionBank = [];
+            usedQuestionIndices = [];
+            saveQuestionsToStorage();
+            renderTeacherQuestionList();
+            showTeacherNotice("🗑️ Cleared all questions. Add your custom questions above!");
+        }
+
+        function renderTeacherQuestionList() {
+            updateQuestionBadgeCount();
+            const container = document.getElementById('teacherQuestionsList');
+            container.innerHTML = '';
+
+            if (questionBank.length === 0) {
+                container.innerHTML = `<p class="text-xs font-semibold text-slate-400 text-center py-4">Question bank is empty. Add questions using the form above!</p>`;
+                return;
+            }
+
+            questionBank.forEach((q, idx) => {
+                const row = document.createElement('div');
+                row.className = "bg-slate-50 hover:bg-indigo-50/40 border border-slate-200 rounded-xl p-3 flex items-start justify-between gap-3 transition";
+                const correctLabel = q.options[q.correct] || '';
+                row.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-xs font-extrabold bg-indigo-100 text-indigo-700 px-2 py-0.2 rounded-md">#${idx + 1}</span>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase">${q.topic || 'English'}</span>
+                        </div>
+                        <p class="text-sm font-title font-bold text-slate-800">${q.question}</p>
+                        <p class="text-xs font-semibold text-emerald-700 mt-0.5">
+                            <i class="fa-solid fa-check mr-1"></i> Answer: <b>${correctLabel}</b>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="editQuestion(${idx})" class="w-8 h-8 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center text-xs transition" title="Edit Question">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuestion(${idx})" class="w-8 h-8 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center text-xs transition" title="Delete Question">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        /********************************************************************
+         * 7. AI WEBCAM HAND TRACKING (ANTI-MIRROR FLIPPED)
+         ********************************************************************/
+        const videoElement = document.getElementById('webcamVideo');
+        const webcamCanvas = document.getElementById('webcamCanvas');
+        const webcamCtx = webcamCanvas.getContext('2d');
+        webcamCanvas.width = 400;
+        webcamCanvas.height = 300;
+
+        let handsDetector = null;
+        let cameraInstance = null;
+        let isCameraRunning = false;
+        let aiHandDirection = 0;
+        let lastThumbDropTime = 0;
+
+        function detectThumbUpGesture(landmarks) {
+            const wrist = landmarks[0];
+            const thumbTip = landmarks[4];
+            const thumbIP = landmarks[3];
+            const thumbMCP = landmarks[2];
+            const indexMCP = landmarks[5];
+
+            const isThumbPointingUp = (thumbTip.y < thumbIP.y - 0.03) &&
+                                      (thumbIP.y < thumbMCP.y - 0.01) &&
+                                      (thumbTip.y < indexMCP.y - 0.04);
+
+            const fingerPairs = [
+                [8, 6],
+                [12, 10],
+                [16, 14],
+                [20, 18]
+            ];
+
+            let curledCount = 0;
+            for (const [tipIdx, pipIdx] of fingerPairs) {
+                const tip = landmarks[tipIdx];
+                const pip = landmarks[pipIdx];
+                const distTipWrist = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
+                const distPipWrist = Math.hypot(pip.x - wrist.x, pip.y - wrist.y);
+
+                if (distTipWrist < distPipWrist * 1.12 || tip.y > thumbMCP.y) {
+                    curledCount++;
+                }
+            }
+
+            return isThumbPointingUp && curledCount >= 3;
+        }
+
+        function onHandResults(results) {
+            const W = webcamCanvas.width;
+            const H = webcamCanvas.height;
+
+            webcamCtx.save();
+            webcamCtx.clearRect(0, 0, W, H);
+
+            // Horizontally flip webcam feed (scale(-1, 1)) so real-world left/right matches screen left/right!
+            webcamCtx.translate(W, 0);
+            webcamCtx.scale(-1, 1);
+            webcamCtx.drawImage(results.image, 0, 0, W, H);
+            webcamCtx.restore();
+
+            const leftZoneX = W * 0.38;
+            const rightZoneX = W * 0.62;
+
+            webcamCtx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+            webcamCtx.lineWidth = 2;
+            webcamCtx.setLineDash([5, 5]);
+            webcamCtx.beginPath();
+            webcamCtx.moveTo(leftZoneX, 0);
+            webcamCtx.lineTo(leftZoneX, H);
+            webcamCtx.moveTo(rightZoneX, 0);
+            webcamCtx.lineTo(rightZoneX, H);
+            webcamCtx.stroke();
+            webcamCtx.setLineDash([]);
+
+            webcamCtx.font = "700 12px 'Baloo 2', sans-serif";
+            webcamCtx.fillStyle = "rgba(56, 189, 248, 0.9)";
+            webcamCtx.fillText("◄ MOVE LEFT", 14, 22);
+            webcamCtx.fillText("MOVE RIGHT ►", rightZoneX + 16, 22);
+
+            const statusBadge = document.getElementById('gestureStatusBadge');
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const rawLandmarks = results.multiHandLandmarks[0];
+
+                const flippedLandmarks = rawLandmarks.map(pt => ({
+                    x: 1 - pt.x,
+                    y: pt.y,
+                    z: pt.z
+                }));
+
+                drawFlippedHandLandmarks(flippedLandmarks, W, H);
+
+                const palmCenter = flippedLandmarks[9];
+                const palmPixelX = palmCenter.x * W;
+                const palmPixelY = palmCenter.y * H;
+
+                webcamCtx.fillStyle = "#f43f5e";
+                webcamCtx.beginPath();
+                webcamCtx.arc(palmPixelX, palmPixelY, 8, 0, Math.PI * 2);
+                webcamCtx.fill();
+                webcamCtx.strokeStyle = "#ffffff";
+                webcamCtx.lineWidth = 2;
+                webcamCtx.stroke();
+
+                const isThumbUp = detectThumbUpGesture(flippedLandmarks);
+
+                if (isThumbUp) {
+                    aiHandDirection = 0;
+                    statusBadge.className = "text-xs sm:text-sm font-bold text-emerald-400 flex items-center gap-1.5";
+                    statusBadge.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> Thumbs Up - DROP CLAW!`;
+
+                    const now = Date.now();
+                    if (claw.state === 'IDLE' && now - lastThumbDropTime > 1800) {
+                        lastThumbDropTime = now;
+                        triggerClawDrop();
+                    }
+                } else {
+                    if (palmCenter.x < 0.38) {
+                        aiHandDirection = -1;
+                        statusBadge.className = "text-xs sm:text-sm font-bold text-sky-300 flex items-center gap-1.5";
+                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Moving Left`;
+                    } else if (palmCenter.x > 0.62) {
+                        aiHandDirection = 1;
+                        statusBadge.className = "text-xs sm:text-sm font-bold text-sky-300 flex items-center gap-1.5";
+                        statusBadge.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Moving Right`;
+                    } else {
+                        aiHandDirection = 0;
+                        statusBadge.className = "text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5";
+                        statusBadge.innerHTML = `<i class="fa-solid fa-hand"></i> Center (Show 👍 to Drop)`;
+                    }
+                }
+            } else {
+                aiHandDirection = 0;
+                statusBadge.className = "text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5";
+                statusBadge.innerHTML = `<i class="fa-regular fa-eye"></i> Show your hand to Camera`;
+            }
+        }
+
+        function drawFlippedHandLandmarks(landmarks, W, H) {
+            const connections = [
+                [0,1],[1,2],[2,3],[3,4],
+                [0,5],[5,6],[6,7],[7,8],
+                [5,9],[9,10],[10,11],[11,12],
+                [9,13],[13,14],[14,15],[15,16],
+                [13,17],[0,17],[17,18],[18,19],[19,20]
+            ];
+
+            webcamCtx.strokeStyle = "#38bdf8";
+            webcamCtx.lineWidth = 3;
+            for (const [a, b] of connections) {
+                webcamCtx.beginPath();
+                webcamCtx.moveTo(landmarks[a].x * W, landmarks[a].y * H);
+                webcamCtx.lineTo(landmarks[b].x * W, landmarks[b].y * H);
+                webcamCtx.stroke();
+            }
+
+            for (let i = 0; i < landmarks.length; i++) {
+                webcamCtx.fillStyle = i === 4 ? "#facc15" : "#f472b6";
+                webcamCtx.beginPath();
+                webcamCtx.arc(landmarks[i].x * W, landmarks[i].y * H, i === 4 ? 6 : 4, 0, Math.PI * 2);
+                webcamCtx.fill();
+            }
+        }
+
+        async function startCamera() {
+            const startBtn = document.getElementById('startCamMainBtn');
+            const statusBadge = document.getElementById('gestureStatusBadge');
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
-                });
-                videoElement.srcObject = stream;
-                await videoElement.play();
-                badge.innerText = "🟢 Vision Tracking Đang Chạy";
-                startPureVisionEngine(videoElement, canvasElement);
-            } catch (err) {
-                console.error("Lỗi camera:", err);
-                badge.innerText = "⚠️ Chưa cấp quyền Camera";
-                badge.className = "bg-rose-100 text-rose-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-rose-400";
+                startBtn.disabled = true;
+                startBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Starting AI Camera...`;
+                statusBadge.innerHTML = `Loading MediaPipe Hands...`;
+
+                if (!handsDetector) {
+                    handsDetector = new Hands({
+                        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                    });
+
+                    handsDetector.setOptions({
+                        maxNumHands: 1,
+                        modelComplexity: 1,
+                        minDetectionConfidence: 0.65,
+                        minTrackingConfidence: 0.65
+                    });
+
+                    handsDetector.onResults(onHandResults);
+                }
+
+                if (!cameraInstance) {
+                    cameraInstance = new Camera(videoElement, {
+                        onFrame: async () => {
+                            if (isCameraRunning && handsDetector) {
+                                await handsDetector.send({ image: videoElement });
+                            }
+                        },
+                        width: 400,
+                        height: 300
+                    });
+                }
+
+                await cameraInstance.start();
+                isCameraRunning = true;
+
+                document.getElementById('camOverlay').classList.add('hidden');
+                document.getElementById('camBtnText').textContent = "STOP WEBCAM";
+                showMachineToast("AI Hand Tracking Activated! 🖐️✨");
+            } catch (error) {
+                startBtn.disabled = false;
+                startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> RETRY WEBCAM`;
+                statusBadge.innerHTML = `Webcam unavailable (Use buttons/keys)`;
+                showMachineToast("Camera not found — use the on-screen buttons or arrow keys!");
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            syncQuestionStorage();
-            spawnPlushiePile();
-            renderClawX();
-            initCamera();
-        });
+        function stopCamera() {
+            isCameraRunning = false;
+            aiHandDirection = 0;
+            if (cameraInstance) {
+                cameraInstance.stop();
+            }
+            document.getElementById('camOverlay').classList.remove('hidden');
+            document.getElementById('camBtnText').textContent = "START WEBCAM";
+            const startBtn = document.getElementById('startCamMainBtn');
+            startBtn.disabled = false;
+            startBtn.innerHTML = `<i class="fa-solid fa-camera"></i> ENABLE AI WEBCAM`;
+            document.getElementById('gestureStatusBadge').innerHTML = `<i class="fa-solid fa-circle-info"></i> Camera Off`;
+        }
 
-        /* ==============================================================
-           8. QUẢN LÝ CÂU HỎI
-           ============================================================== */
-        function openQuestionManager() {
-            const box = document.getElementById('questionListBox');
-            box.innerHTML = questions.map((q, i) => `<div class="bg-gray-50 p-3 rounded-xl border text-xs mb-2"><b>${i+1}. ${q.q}</b></div>`).join('');
-            document.getElementById('managerModal').classList.remove('hidden');
-            document.getElementById('managerModal').classList.add('flex');
+        function toggleCamera() {
+            if (isCameraRunning) stopCamera();
+            else startCamera();
         }
-        function closeQuestionManager() { document.getElementById('managerModal').classList.add('hidden'); document.getElementById('managerModal').classList.remove('flex'); }
-        function addNewQuestion() {
-            const q = document.getElementById('inputQ').value.trim();
-            const a = document.getElementById('inputA').value.trim();
-            const b = document.getElementById('inputB').value.trim();
-            const c = document.getElementById('inputC').value.trim();
-            const d = document.getElementById('inputD').value.trim();
-            const ans = parseInt(document.getElementById('inputAns').value, 10);
-            if (!q || !a || !b || !c || !d) return;
-            questions.unshift({ q, options: [a, b, c, d], answer: ans });
-            syncQuestionStorage();
-            closeQuestionManager();
+
+        /********************************************************************
+         * 8. KEYBOARD, MOUSE & TOUCH CONTROLS
+         ********************************************************************/
+        function setupControls() {
+            const btnLeft = document.getElementById('btnLeft');
+            const btnRight = document.getElementById('btnRight');
+
+            const startLeft = (e) => { e.preventDefault(); claw.moveDir = -1; };
+            const startRight = (e) => { e.preventDefault(); claw.moveDir = 1; };
+            const stopMove = (e) => { e.preventDefault(); claw.moveDir = 0; };
+
+            btnLeft.addEventListener('mousedown', startLeft);
+            btnLeft.addEventListener('touchstart', startLeft, { passive: false });
+            btnLeft.addEventListener('mouseup', stopMove);
+            btnLeft.addEventListener('mouseleave', stopMove);
+            btnLeft.addEventListener('touchend', stopMove);
+
+            btnRight.addEventListener('mousedown', startRight);
+            btnRight.addEventListener('touchstart', startRight, { passive: false });
+            btnRight.addEventListener('mouseup', stopMove);
+            btnRight.addEventListener('mouseleave', stopMove);
+            btnRight.addEventListener('touchend', stopMove);
+
+            window.addEventListener('keydown', (e) => {
+                const quizOpen = !document.getElementById('quizModal').classList.contains('hidden');
+                const teacherOpen = !document.getElementById('teacherModal').classList.contains('hidden');
+                if (quizOpen || teacherOpen) return;
+
+                if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                    claw.moveDir = -1;
+                } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                    claw.moveDir = 1;
+                } else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    triggerClawDrop();
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                if (['ArrowLeft', 'a', 'A', 'ArrowRight', 'd', 'D'].includes(e.key)) {
+                    claw.moveDir = 0;
+                }
+            });
         }
-        function restoreSampleQuestions() { questions = [...SAMPLE_QUESTIONS]; syncQuestionStorage(); closeQuestionManager(); }
+
+        function gameLoop() {
+            updateGamePhysics();
+            drawClawMachine();
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function () {
+            loadQuestionsFromStorage();
+            initBgStars();
+            initPlushies();
+            setupControls();
+            gameLoop();
+        };
     </script>
 </body>
 </html>
